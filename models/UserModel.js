@@ -2,7 +2,7 @@ import {DataTypes} from "sequelize";
 import db from "../config/Database.js";
 import RoleModel from "./RoleModel.js";
 
-const UserModel = db.define("admin", {
+const UserModel = db.define("user", {
     name: {
         type: DataTypes.STRING,
         allowNull: false
@@ -22,11 +22,11 @@ const UserModel = db.define("admin", {
     freezeTableName: true
 })
 
-UserModel.hasMany(RoleModel, {
+RoleModel.hasMany(UserModel, {
     foreignKey: "roleId",
     onDelete: "cascade",
     onUpdate: "cascade"
 })
-RoleModel.belongsTo(UserModel)
+UserModel.belongsTo(RoleModel);
 
 export default UserModel

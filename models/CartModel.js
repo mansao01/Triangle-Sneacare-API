@@ -5,6 +5,9 @@ import UserModel from "./UserModel.js";
 const CartModel = db.define("cart", {
     status: {
         type: DataTypes.STRING, //active or checkout
+    },
+    totalPrice: {
+        type: DataTypes.INTEGER
     }
 }, {
     freezeTableName: true

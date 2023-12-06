@@ -15,6 +15,9 @@ const UserModel = db.define("user", {
         type: DataTypes.STRING,
         allowNull: false
     },
+    address: {
+        type: DataTypes.STRING
+    },
     refresh_token: {
         type: DataTypes.TEXT
     }

@@ -2,7 +2,7 @@ import {DataTypes} from "sequelize";
 import db from "../config/Database.js";
 import itemType from "./ItemType.js";
 
-const ItemNameModel = db.define("item_name", {
+const ProductModel = db.define("product", {
     productName: {
         type: DataTypes.STRING, // wash shoes deep clean, wash shoes quick clean, etc
         unique: true,
@@ -15,6 +15,6 @@ const ItemNameModel = db.define("item_name", {
     freezeTableName: true
 })
 
-itemType.hasMany(ItemNameModel);
+itemType.hasMany(ProductModel);
 
-export default ItemNameModel
+export default ProductModel

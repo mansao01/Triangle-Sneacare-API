@@ -1,7 +1,7 @@
 import {DataTypes} from "sequelize";
 import db from "../config/Database.js";
 import UserModel from "./UserModel.js";
-import ItemNameModel from "./ItemNameModel.js";
+import ProductModel from "./ProductModel.js";
 import CartModel from "./CartModel.js";
 
 const TransactionModel = db.define("transaction", {
@@ -26,7 +26,7 @@ UserModel.hasMany(TransactionModel, {
     onDelete: "cascade",
     onUpdate: "cascade"
 })
-ItemNameModel.hasMany(TransactionModel, {
+ProductModel.hasMany(TransactionModel, {
     foreignKey: "itemNameId",
     onDelete: "cascade",
     onUpdate: "cascade"

@@ -1,24 +1,20 @@
 import express from 'express';
 import db from "./config/Database.js";
-import userModel from "./models/UserModel.js";
-import itemNameModel from "./models/ProductModel.js";
-import roleModel from "./models/RoleModel.js";
-import transactionModel from "./models/TransactionModel.js";
-import cartModel from "./models/CartModel.js";
+import RoleRoute from "./routes/RoleRoute.js";
+import bodyParser from "body-parser";
 
 const app = express()
 
 try {
+    await db.authenticate()
     console.log("Database connected")
     await db.sync()
-    userModel.sync()
-    itemNameModel.sync()
-    roleModel.sync()
-    transactionModel.sync()
-    cartModel.sync()
 } catch (e) {
     console.log(e)
 }
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(RoleRoute)
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => {

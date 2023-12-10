@@ -9,7 +9,7 @@ export const addProduct = async (req, res) => {
         const product = await ProductModel.create({
             productName: productName,
             price: price,
-            itemType: itemTypeId
+            itemTypeId: itemTypeId
         });
 
         const itemType = await ItemTypeModel.findByPk(itemTypeId);

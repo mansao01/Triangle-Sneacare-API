@@ -4,6 +4,6 @@ import {addItemType, deleteItemType} from "../controller/ItemTypeController.js";
 const router = express.Router();
 
 router.post("/v1/addItemType", addItemType)
-router.post("/v1/deleteItemType", deleteItemType)
+router.delete("/v1/deleteItemType/:id", deleteItemType)
 
 export default router;

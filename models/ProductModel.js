@@ -1,6 +1,6 @@
 import {DataTypes} from "sequelize";
 import db from "../config/Database.js";
-import itemType from "./ItemType.js";
+import ItemTypeModel from "./ItemTypeModel.js";
 
 const ProductModel = db.define("product", {
     productName: {
@@ -15,6 +15,8 @@ const ProductModel = db.define("product", {
     freezeTableName: true
 })
 
-itemType.hasMany(ProductModel);
+ItemTypeModel.hasMany(ProductModel);
+ProductModel.belongsTo(ItemTypeModel); // Define the association
+
 
 export default ProductModel

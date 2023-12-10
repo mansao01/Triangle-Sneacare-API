@@ -4,6 +4,7 @@ import db from "../config/Database.js";
 const ItemTypeModel = db.define("item_type", {
     itemType: {
         type: DataTypes.STRING, //helmet, shoes, bag, etc
+        unique: true,
     }
 },{
     freezeTableName: true

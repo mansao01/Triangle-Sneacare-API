@@ -1,17 +1,10 @@
 
-import ItemTypeModel from "../models/ItemType.js";
-import RoleModel from "../models/RoleModel.js";
+import ItemTypeModel from "../models/ItemTypeModel.js";
 
 export const addItemType = async (req, res) => {
  try {
      const {itemType } = req.body;
-     // Check if the role already exists
-     const existingType = await ItemTypeModel.findOne({ itemType });
 
-     if (existingType) {
-         // If the role already exists, send a response to the user
-         return res.status(400).json({ msg: "Role already exists" });
-     }
 
      const newType = await ItemTypeModel.create({ itemType });
      res.status(201).json({ msg: "item type added successfully", newType });

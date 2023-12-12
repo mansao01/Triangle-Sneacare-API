@@ -40,5 +40,6 @@ CartModel.hasMany(TransactionModel, {
     onUpdate: "cascade"
 })
 
+TransactionModel.belongsTo(UserModel)
 
 export default TransactionModel

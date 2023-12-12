@@ -14,8 +14,11 @@ const TransactionModel = db.define("transaction", {
         allowNull: false
     },
     washStatus: {
-        type: DataTypes.STRING, //cleaning, drying, ironing, packing, done
+        type: DataTypes.STRING, //pending, cleaning, drying, ironing, packing, done
         allowNull: false
+    },
+    imageUrl:{
+        type:DataTypes.STRING
     }
 }, {
     freezeTableName: true
@@ -27,7 +30,7 @@ UserModel.hasMany(TransactionModel, {
     onUpdate: "cascade"
 })
 ProductModel.hasMany(TransactionModel, {
-    foreignKey: "itemNameId",
+    foreignKey: "productId",
     onDelete: "cascade",
     onUpdate: "cascade"
 })

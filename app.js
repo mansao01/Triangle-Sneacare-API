@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import UserRoute from "./routes/UserRoute.js";
 import ItemTypeRoute from "./routes/ItemTypeRoute.js";
 import ProductRoute from "./routes/ProductRoute.js";
+import TransactionRoute from "./routes/TransactionRoute.js";
 
 const app = express()
 
@@ -21,6 +22,7 @@ app.use(RoleRoute)
 app.use(UserRoute)
 app.use(ItemTypeRoute)
 app.use(ProductRoute)
+app.use(TransactionRoute)
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => {

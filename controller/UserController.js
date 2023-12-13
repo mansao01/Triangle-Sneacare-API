@@ -86,7 +86,9 @@ export const loginUser = async (req, res) => {
         await UserModel.update({refresh_token: refreshToken}, {
             where: {id}
         });
-        res.status(200).json({msg: "Login successful", user: {id, name, email, roleId}, accessToken, refreshToken});
+
+        const role = await RoleModel.findByPk(roleId);
+        res.status(200).json({msg: "Login successful", user: {id, name, email, role},accessToken, refreshToken});
     } catch (error) {
         console.error(error);
         res.status(400).json({msg: "Login failed due to an error"});

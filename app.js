@@ -1,12 +1,13 @@
 import express from 'express';
 import db from "./config/Database.js";
+import dotEnv from 'dotenv';
 import RoleRoute from "./routes/RoleRoute.js";
 import bodyParser from "body-parser";
 import UserRoute from "./routes/UserRoute.js";
 import ItemTypeRoute from "./routes/ItemTypeRoute.js";
 import ProductRoute from "./routes/ProductRoute.js";
 import TransactionRoute from "./routes/TransactionRoute.js";
-
+dotEnv.config()
 const app = express()
 
 try {

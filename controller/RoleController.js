@@ -7,7 +7,7 @@ export const addRole = async (req, res) => {
         // Check if the role already exists
         const existingRole = await RoleModel.findOne({ role });
 
-        if (existingRole) {
+        if (!existingRole) {
             // If the role already exists, send a response to the user
             return res.status(400).json({ msg: "Role already exists" });
         }
@@ -17,7 +17,8 @@ export const addRole = async (req, res) => {
 
         res.status(201).json({ msg: "Role added successfully", newRole });
     } catch (e) {
-        res.status(400).json({ msg: e.message || "An error occurred while adding the role" });
+        res.status(400).json({ msg: e.message || "An error occurred while addin" +
+                "g the role" });
     }
 }
 

@@ -88,7 +88,7 @@ export const loginUser = async (req, res) => {
         });
 
         const role = await RoleModel.findByPk(roleId);
-        res.status(200).json({msg: "Login successful", user: {id, name, email, role},accessToken, refreshToken});
+        res.status(200).json({msg: "Login successful", user: {id, name, email, role}, accessToken, refreshToken});
     } catch (error) {
         console.error(error);
         res.status(400).json({msg: "Login failed due to an error"});
@@ -113,3 +113,28 @@ export const logoutUser = async (req, res) => {
         res.status(400).json({msg: "Logout failed due to an error"});
     }
 }
+
+export const getProfile = async (req, res) => {
+    try {
+        const loggedInUserId = req.user.id; // Access user ID from the request
+
+        // Fetch logged-in user's data
+        const loggedInUser = await UserModel.findByPk(loggedInUserId, {
+            attributes: ['id','name', 'email', "roleId"]
+        });
+
+        if (!loggedInUser) {
+            return res.status(404).json({msg: "Logged-in user not found"});
+        }
+
+        res.json({
+            loggedInId: loggedInUser.id,
+            loggedInUserName: loggedInUser.name,
+            loggedInUserEmail: loggedInUser.email,
+            loggedInUserRole: loggedInUser.roleId
+        });
+    } catch (error) {
+        console.error("Error fetching profile:", error);
+        res.status(500).json({msg: "Internal server error"});
+    }
+};

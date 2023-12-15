@@ -24,8 +24,12 @@ const TransactionModel = db.define("transaction", {
     freezeTableName: true
 })
 
-UserModel.hasMany(TransactionModel, {
-    foreignKey: "orderedBy",
+TransactionModel.belongsTo(UserModel) // Associate Transaction with User
+TransactionModel.belongsTo(ProductModel) // Associate Transaction with Product
+TransactionModel.belongsTo(CartModel) // Associate Transaction with Cart
+
+ProductModel.hasMany(TransactionModel, {
+    foreignKey: "userId",
     onDelete: "cascade",
     onUpdate: "cascade"
 })

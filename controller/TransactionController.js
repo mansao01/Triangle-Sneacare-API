@@ -13,8 +13,8 @@ export const addTransaction = (req, res) => {
             return res.status(400).json({msg: err.message});
         }
 
-        const {confirmed, washStatus, orderById, productId, cartId} = req.body;
-        const transactionDate = dateFormat(new Date(), "yyyymmdd-HHMMss");
+        const {confirmed, washStatus, productId, userId} = req.body;
+        const transactionDate = new Date();
         let imageUrl = '';
 
         // Call ImgUpload function to upload to GCS
@@ -33,9 +33,8 @@ export const addTransaction = (req, res) => {
                         confirmed: confirmed,
                         washStatus: washStatus,
                         imageUrl: imageUrl,
-                        orderedBy: orderById,
                         productId: productId,
-                        cartId: cartId
+                        userId: userId
                     });
 
                     // If transaction is created successfully, send a success response

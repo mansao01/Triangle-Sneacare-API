@@ -7,6 +7,7 @@ import UserRoute from "./routes/UserRoute.js";
 import ItemTypeRoute from "./routes/ItemTypeRoute.js";
 import ProductRoute from "./routes/ProductRoute.js";
 import TransactionRoute from "./routes/TransactionRoute.js";
+import CartRoute from "./routes/CartRoute.js";
 dotEnv.config()
 const app = express()
 
@@ -24,6 +25,7 @@ app.use(UserRoute)
 app.use(ItemTypeRoute)
 app.use(ProductRoute)
 app.use(TransactionRoute)
+app.use(CartRoute)
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => {

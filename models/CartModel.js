@@ -13,6 +13,6 @@ const CartModel = db.define("cart", {
     freezeTableName: true
 })
 
-CartModel.belongsTo(UserModel);
-
+CartModel.belongsTo(UserModel)
+UserModel.hasMany(CartModel)
 export default CartModel

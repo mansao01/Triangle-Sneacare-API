@@ -44,14 +44,9 @@ export const register = async (req, res) => {
 
         res.status(200).json({msg: "Registration successful", user: userResponse});
     } catch (error) {
-        // Handle specific errors
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            // Duplicate key error (e.g., email already exists)
-            return res.status(400).json({msg: "Email already exists"});
-        }
         console.error(error);
         // Handle other errors
-        res.status(400).json({msg: "Registration failed due to an error"});
+        res.status(400).json({msg: "Registration failed due to an error", error});
     }
 };
 

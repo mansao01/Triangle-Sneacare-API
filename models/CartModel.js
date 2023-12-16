@@ -14,5 +14,9 @@ const CartModel = db.define("cart", {
 })
 
 CartModel.belongsTo(UserModel)
-UserModel.hasMany(CartModel)
+UserModel.hasMany(CartModel, {
+    foreignKey: "userId",
+    onDelete: "cascade",
+    onUpdate: "cascade"
+})
 export default CartModel

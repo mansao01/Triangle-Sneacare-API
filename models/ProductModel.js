@@ -15,8 +15,8 @@ const ProductModel = db.define("product", {
     freezeTableName: true
 })
 
-ItemTypeModel.hasMany(ProductModel);
 ProductModel.belongsTo(ItemTypeModel); // Define the association
+ItemTypeModel.hasMany(ProductModel);
 
 
 export default ProductModel

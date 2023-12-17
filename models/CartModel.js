@@ -13,10 +13,6 @@ const CartModel = db.define("cart", {
     freezeTableName: true
 })
 
-CartModel.belongsTo(UserModel)
-UserModel.hasMany(CartModel, {
-    foreignKey: "userId",
-    onDelete: "cascade",
-    onUpdate: "cascade"
-})
+CartModel.belongsTo(UserModel); // Define the association
+UserModel.hasMany(CartModel);
 export default CartModel

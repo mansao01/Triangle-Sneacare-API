@@ -97,3 +97,38 @@ export const addToCart = async (req, res) => {
         res.status(500).json({ msg: 'Failed to add item to cart' });
     }
 };
+
+
+export const getCart = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const cart = await CartModel.findOne({
+            where: { userId: userId },
+            include: [{ model: TransactionModel, include: [{ model: ProductModel }] }]
+        });
+
+        if (!cart) {
+            return res.status(404).json({ msg: 'Cart not found' });
+        }
+
+        const itemsInCart = cart.transactions.map(item => ({
+            id: item.id,
+            transactionDate: item.transactionDate,
+            confirmed: item.confirmed,
+            washStatus: item.washStatus,
+            imageUrl: item.imageUrl,
+            productDetail: item.product
+        }));
+
+        res.status(200).json({
+            msg: 'Cart retrieved successfully',
+            cartId: cart.id,
+            items: itemsInCart,
+            totalPrice: cart.totalPrice
+        });
+    } catch (error) {
+        console.error('Error retrieving cart:', error);
+        res.status(500).json({ msg: 'Failed to retrieve cart' });
+    }
+}

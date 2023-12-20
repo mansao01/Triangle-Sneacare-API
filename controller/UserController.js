@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 
 export const register = async (req, res) => {
-    const {name, email, password, roleId} = req.body;
+    const {name, email, password, roleId, address, phone} = req.body;
 
     if (password.length < 6) {
         return res.status(400).json({msg: "Password must be at least 6 characters long"});
@@ -19,7 +19,9 @@ export const register = async (req, res) => {
             name: name,
             email: email,
             password: hashedPassword,
-            roleId: roleId
+            roleId: roleId,
+            address: address,
+            phone: phone
         });
 
         const role = await RoleModel.findByPk(roleId);
@@ -33,9 +35,6 @@ export const register = async (req, res) => {
             id: user.id,
             name: user.name,
             email: user.email,
-            password: user.password,
-            updatedAt: user.updatedAt,
-            createdAt: user.createdAt,
             role: {
                 id: role.id,
                 role: role.role
@@ -83,7 +82,15 @@ export const loginUser = async (req, res) => {
         });
 
         const role = await RoleModel.findByPk(roleId);
-        res.status(200).json({msg: "Login successful", user: {id, name, email, role}, accessToken, refreshToken});
+        res.status(200).json({
+            msg: "Login successful",
+            user: {
+                id, name, email, role: {
+                    id: role.id,
+                    role: role.role
+                }
+            }, accessToken, refreshToken
+        });
     } catch (error) {
         console.error(error);
         res.status(400).json({msg: "Login failed due to an error"});
@@ -115,7 +122,7 @@ export const getProfile = async (req, res) => {
 
         // Fetch logged-in user's data
         const loggedInUser = await UserModel.findByPk(loggedInUserId, {
-            attributes: ['id','name', 'email', "roleId"]
+            attributes: ['id', 'name', 'email', "roleId"]
         });
 
         if (!loggedInUser) {

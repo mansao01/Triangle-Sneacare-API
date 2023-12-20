@@ -9,13 +9,17 @@ const UserModel = db.define("user", {
     },
     email: {
         type: DataTypes.STRING,
-        unique: true
+        unique: true,
+        allowNull: false
     },
     password: {
         type: DataTypes.STRING,
         allowNull: false
     },
     address: {
+        type: DataTypes.STRING
+    },
+    phone: {
         type: DataTypes.STRING
     },
     refresh_token: {

@@ -129,12 +129,20 @@ export const getProfile = async (req, res) => {
             return res.status(404).json({msg: "Logged-in user not found"});
         }
 
-        res.json({
-            loggedInId: loggedInUser.id,
-            loggedInUserName: loggedInUser.name,
-            loggedInUserEmail: loggedInUser.email,
-            loggedInUserRole: loggedInUser.roleId
-        });
+
+        const userRole = await RoleModel.findByPk(loggedInUser.roleId);
+        console.log(loggedInUser.roleId)
+        const profileResponse = {
+            id: loggedInUser.id,
+            name: loggedInUser.name,
+            email: loggedInUser.email,
+            role: {
+                id: userRole.id,
+                name: userRole.role
+            }
+        }
+
+        res.status(200).json({msg: "Success", profile: profileResponse})
     } catch (error) {
         console.error("Error fetching profile:", error);
         res.status(500).json({msg: "Internal server error"});

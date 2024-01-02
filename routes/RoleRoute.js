@@ -4,7 +4,7 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.post("/v1/addRole", verifyToken,addRole)
-router.delete("/v1/deleteRole/:id", deleteRole)
+router.post("/v1/addRole",addRole)
+router.delete("/v1/deleteRole/:id",verifyToken, deleteRole)
 
 export default router;

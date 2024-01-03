@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
     res.status(201).json({msg: "welcome to triangle sneacare api"})
 })
 
-const PORT = process.env.PORT || 8000
+const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
     console.log("Server start in " + PORT + " Port")
 })

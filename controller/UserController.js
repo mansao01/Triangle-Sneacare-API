@@ -60,11 +60,10 @@ export const register = async (req, res) => {
             }
         };
 
-        res.status(200).json({msg: "Registration successful", user: userResponse});
-
         transporter.sendMail(message).then((info) => {
             return res.status(201).json({
-                msg: "Email sent",
+                msg: "Registration successful",
+                user: userResponse,
                 info: info.messageId,
                 preview: nodemailer.getTestMessageUrl(info)
             })

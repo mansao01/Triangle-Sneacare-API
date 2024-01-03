@@ -2,10 +2,29 @@ import UserModel from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import RoleModel from "../models/RoleModel.js";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 
 export const register = async (req, res) => {
     const {name, email, password, roleId, address, phone} = req.body;
+    let config = {
+        host: "smtp.gmail.com",
+        service: "gmail",
+        auth: {
+            user: process.env.GMAIL_APP_USER,
+            pass: process.env.GMAIL_APP_PASSWORD
+        }
+    }
+
+    let transporter = nodemailer.createTransport(config);
+
+    let message = {
+        from: process.env.GMAIL_APP_USER,
+        to: email,
+        subject: "Welcome to Triangle Sneaker",
+        text: "You have successfully registered to Triangle Sneaker"
+    }
+
 
     if (password.length < 6) {
         return res.status(400).json({msg: "Password must be at least 6 characters long"});
@@ -42,6 +61,17 @@ export const register = async (req, res) => {
         };
 
         res.status(200).json({msg: "Registration successful", user: userResponse});
+
+        transporter.sendMail(message).then((info) => {
+            return res.status(201).json({
+                msg: "Email sent",
+                info: info.messageId,
+                preview: nodemailer.getTestMessageUrl(info)
+            })
+        }).catch((err) => {
+            console.error(err); // Log the error for debugging purposes
+            return res.status(500).json({msg: err.message}); // Respond with the error message
+        })
     } catch (error) {
         console.error(error);
         // Handle other errors

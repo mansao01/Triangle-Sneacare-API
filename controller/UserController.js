@@ -3,7 +3,11 @@ import bcrypt from "bcrypt";
 import RoleModel from "../models/RoleModel.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import ImgUpload from "../modules/imgUpload.js";
+import multer from "multer";
 
+const storage = multer.memoryStorage();
+const upload = multer({storage: storage});
 
 export const register = async (req, res) => {
     const {name, email, password, roleId, address, phone} = req.body;
@@ -126,6 +130,45 @@ export const loginUser = async (req, res) => {
     }
 }
 
+
+export const updateUser = async (req, res) => {
+    upload.single('image')(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({msg: err.message});
+        }
+
+        const {id} = req.params;
+        const {name, address, phone} = req.body;
+        let imageUrl = '';
+
+        const user = await UserModel.findOne({where: {id}});
+        if (!user) {
+            return res.status(404).json({msg: "User not found"});
+        }
+
+        ImgUpload.uploadToGcs(req, res, async (err) => {
+            if (req.file && req.file.cloudStoragePublicUrl) {
+                imageUrl = req.file.cloudStoragePublicUrl
+            }
+
+            try {
+                await UserModel.update({
+                    name: name,
+                    address: address,
+                    phone: phone,
+                    pictureUrl: imageUrl
+                }, {
+                    where: {id}
+                });
+
+                return res.status(200).json({msg: "User updated successfully"});
+            } catch (e) {
+                return res.status(500).json({msg: e});
+            }
+        })
+
+    })
+}
 export const logoutUser = async (req, res) => {
     try {
         const {refreshToken} = req.body;

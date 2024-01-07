@@ -24,6 +24,9 @@ const UserModel = db.define("user", {
     },
     refresh_token: {
         type: DataTypes.TEXT
+    },
+    pictureUrl: {
+        type: DataTypes.STRING
     }
 }, {
     freezeTableName: true

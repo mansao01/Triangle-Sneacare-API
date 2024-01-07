@@ -1,8 +1,17 @@
-import {DataTypes} from "sequelize";
+import {DataTypes, Sequelize} from "sequelize";
 import db from "../config/Database.js";
 import RoleModel from "./RoleModel.js";
 
 const UserModel = db.define("user", {
+    id:{
+        primaryKey: true,
+        type: DataTypes.STRING,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        validate:{
+            notEmpty: true
+        }
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false

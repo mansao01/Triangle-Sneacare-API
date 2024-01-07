@@ -9,7 +9,7 @@ router.post("/v1/register", register)
 router.post("/v1/login", loginUser)
 router.post("/v1/logout", logoutUser)
 router.get("/v1/profile", authMiddleware, getProfile)
-router.patch("/v1/updateUser/:id", updateUser)
+router.patch("/v1/updateUser",authMiddleware, updateUser)
 
 
 export default router;

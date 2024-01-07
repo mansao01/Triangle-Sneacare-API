@@ -137,7 +137,7 @@ export const updateUser = async (req, res) => {
             return res.status(400).json({msg: err.message});
         }
 
-        const {id} = req.params;
+        const id = req.user.id;
         const {name, address, phone} = req.body;
         let imageUrl = '';
 

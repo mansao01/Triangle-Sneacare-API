@@ -5,6 +5,15 @@ import ProductModel from "./ProductModel.js";
 import CartModel from "./CartModel.js";
 
 const TransactionModel = db.define("transaction", {
+    id:{
+        primaryKey: true,
+        type: DataTypes.STRING,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        validate:{
+            notEmpty: true
+        }
+    },
     transactionDate: {
         type: DataTypes.DATE,
         allowNull: false
@@ -24,9 +33,9 @@ const TransactionModel = db.define("transaction", {
     freezeTableName: true
 })
 
-TransactionModel.belongsTo(UserModel) // Associate Transaction with User
-TransactionModel.belongsTo(ProductModel) // Associate Transaction with Product
-TransactionModel.belongsTo(CartModel) // Associate Transaction with Cart
+TransactionModel.belongsTo(UserModel)
+TransactionModel.belongsTo(ProductModel)
+TransactionModel.belongsTo(CartModel)
 
 ProductModel.hasMany(TransactionModel, {
     foreignKey: "userId",

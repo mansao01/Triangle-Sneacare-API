@@ -161,7 +161,9 @@ export const updateUser = async (req, res) => {
                     where: {id}
                 });
 
-                return res.status(200).json({msg: "User updated successfully"});
+                const updatedUser = await UserModel.findOne({where: {id}});
+
+                return res.status(200).json({msg: "User updated successfully", data: updatedUser});
             } catch (e) {
                 return res.status(500).json({msg: e});
             }

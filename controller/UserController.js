@@ -222,3 +222,19 @@ export const getProfile = async (req, res) => {
         res.status(500).json({msg: "Internal server error"});
     }
 };
+
+
+export const getDrivers = async (req, res) => {
+    try {
+        const drivers = await UserModel.findAll({
+            where: {roleId: 3},
+            attributes: ['id', 'name', 'email', 'address', 'phone', 'pictureUrl'],
+            include: [{model: RoleModel}]
+        });
+
+        res.status(200).json({msg: "Success", drivers})
+    } catch (error) {
+        console.error("Error fetching drivers:", error);
+        res.status(500).json({msg: "Internal server error"});
+    }
+}

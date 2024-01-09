@@ -83,6 +83,98 @@ export const register = async (req, res) => {
 };
 
 
+export const registerDriver = async (req, res) => {
+    upload.single('image')(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({msg: err.message});
+        }
+        const {name, email, password, address, phone} = req.body;
+        const roleId = 3
+        let imageUrl = '';
+
+        let config = {
+            host: "smtp.gmail.com",
+            service: "gmail",
+            auth: {
+                user: process.env.GMAIL_APP_USER,
+                pass: process.env.GMAIL_APP_PASSWORD
+            }
+        }
+
+        let transporter = nodemailer.createTransport(config);
+
+        let message = {
+            from: process.env.GMAIL_APP_USER,
+            to: email,
+            subject: "Welcome to Triangle Sneaker",
+            text: "You have successfully registered as driver in Triangle Sneaker"
+        }
+
+
+        if (password.length < 6) {
+            return res.status(400).json({msg: "Password must be at least 6 characters long"});
+        }
+
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        ImgUpload.uploadToGcs(req, res, async (err) => {
+            if (req.file && req.file.cloudStoragePublicUrl) {
+                imageUrl = req.file.cloudStoragePublicUrl
+            }
+
+            try {
+                const user = await UserModel.create({
+                    name: name,
+                    email: email,
+                    password: hashedPassword,
+                    roleId: roleId,
+                    address: address,
+                    phone: phone,
+                    pictureUrl: imageUrl
+                });
+
+                const role = await RoleModel.findByPk(roleId);
+
+                if (!role) {
+                    return res.status(404).json({msg: "Role not found"});
+                }
+
+                // Build the user response object with role details
+                const userResponse = {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    pictureUrl: user.pictureUrl,
+                    role: {
+                        id: role.id,
+                        role: role.role
+                    }
+                };
+
+                transporter.sendMail(message).then((info) => {
+                    return res.status(201).json({
+                        msg: "Registration successful",
+                        user: userResponse,
+                        info: info.messageId,
+                        preview: nodemailer.getTestMessageUrl(info)
+                    })
+                }).catch((err) => {
+                    console.error(err); // Log the error for debugging purposes
+                    return res.status(500).json({msg: err.message}); // Respond with the error message
+                })
+            } catch (error) {
+                console.error(error);
+                // Handle other errors
+                res.status(400).json({msg: "Registration failed due to an error", error});
+            }
+        })
+
+    })
+
+};
+
+
 export const loginUser = async (req, res) => {
     try {
         const {email, password} = req.body;

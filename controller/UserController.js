@@ -5,45 +5,27 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import ImgUpload from "../modules/imgUpload.js";
 import multer from "multer";
+import userModel from "../models/UserModel.js";
 
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 
 export const register = async (req, res) => {
     const {name, email, password, roleId} = req.body;
-    let config = {
-        host: "smtp.gmail.com",
-        service: "gmail",
-        auth: {
-            user: process.env.GMAIL_APP_USER,
-            pass: process.env.GMAIL_APP_PASSWORD
-        }
-    }
-
-    let transporter = nodemailer.createTransport(config);
-
-    let message = {
-        from: process.env.GMAIL_APP_USER,
-        to: email,
-        subject: "Welcome to Triangle Sneaker",
-        text: "You have successfully registered to Triangle Sneaker"
-    }
-
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     if (password.length < 6) {
         return res.status(400).json({msg: "Password must be at least 6 characters long"});
     }
 
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
-
     try {
-        const user = await UserModel.create({
-            name: name,
-            email: email,
-            password: hashedPassword,
-            roleId: roleId,
+        const emailCheck = await userModel.findOne({
+            where: {email}
         });
+        if (emailCheck) {
+            return res.status(400).json({msg: "Email already exists"});
+        }
 
         const role = await RoleModel.findByPk(roleId);
 
@@ -51,7 +33,26 @@ export const register = async (req, res) => {
             return res.status(404).json({msg: "Role not found"});
         }
 
-        // Build the user response object with role details
+
+        let config = {
+            host: "smtp.gmail.com",
+            service: "gmail",
+            auth: {
+                user: process.env.GMAIL_APP_USER,
+                pass: process.env.GMAIL_APP_PASSWORD
+            }
+        }
+
+        let transporter = nodemailer.createTransport(config);
+
+
+        const user = await UserModel.create({
+            name: name,
+            email: email,
+            password: hashedPassword,
+            roleId: roleId,
+        });
+
         const userResponse = {
             id: user.id,
             name: user.name,
@@ -61,6 +62,14 @@ export const register = async (req, res) => {
                 role: role.role
             }
         };
+
+        let message = {
+            from: process.env.GMAIL_APP_USER,
+            to: email,
+            subject: "Account Verification Link",
+            text: `Hello ${name} Please verify your email by clicking this link :
+            http://localhost:8080/v1/verify-email/${user.id}`
+        }
 
         transporter.sendMail(message).then((info) => {
             return res.status(201).json({
@@ -80,6 +89,33 @@ export const register = async (req, res) => {
     }
 };
 
+export const verifyEmail = async (req, res) => {
+    try {
+        const id = req.params.id
+
+        const user = await UserModel.findOne({
+            where: {
+                id: id
+            }
+        })
+
+        if (!user) {
+            return res.status(400).json({msg: "User not found"})
+        } else {
+            await userModel.update({
+                isVerified: true
+            }, {
+                where: {
+                    id: id
+                }
+            })
+        }
+
+        res.status(200).json({msg: "Email verified successfully"})
+    } catch (e) {
+        res.status(400).json({msg: "Invalid user id"})
+    }
+}
 
 export const registerDriver = async (req, res) => {
     upload.single('image')(req, res, async (err) => {
@@ -164,7 +200,7 @@ export const registerDriver = async (req, res) => {
             } catch (error) {
                 console.error(error);
                 // Handle other errors
-                res.status(400).json({msg: "Registration failed due to an error", error});
+                res.status(400).json({msg: "Registration failed due to an error", error: err + error});
             }
         })
 
@@ -255,7 +291,7 @@ export const updateUser = async (req, res) => {
 
                 return res.status(200).json({msg: "User updated successfully", data: updatedUser});
             } catch (e) {
-                return res.status(500).json({msg: e});
+                return res.status(500).json({msg: e + err});
             }
         })
 

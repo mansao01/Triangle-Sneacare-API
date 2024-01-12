@@ -10,7 +10,7 @@ const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 
 export const register = async (req, res) => {
-    const {name, email, password, roleId, address, phone} = req.body;
+    const {name, email, password, roleId} = req.body;
     let config = {
         host: "smtp.gmail.com",
         service: "gmail",
@@ -43,8 +43,6 @@ export const register = async (req, res) => {
             email: email,
             password: hashedPassword,
             roleId: roleId,
-            address: address,
-            phone: phone
         });
 
         const role = await RoleModel.findByPk(roleId);

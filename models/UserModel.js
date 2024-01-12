@@ -1,4 +1,4 @@
-import {DataTypes, Sequelize} from "sequelize";
+import {DataTypes} from "sequelize";
 import db from "../config/Database.js";
 import RoleModel from "./RoleModel.js";
 
@@ -36,7 +36,11 @@ const UserModel = db.define("user", {
     },
     pictureUrl: {
         type: DataTypes.STRING
-    }
+    },
+    isVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
 }, {
     freezeTableName: true
 })

@@ -221,13 +221,16 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({msg: "Email not found"});
         }
 
+        if (!user.isVerified) {
+            return res.status(400).json({msg: "Please verify your email first, check your email"});
+        }
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
             return res.status(400).json({msg: "Wrong password"});
         }
 
-        const {id, name, roleId} = user;
+        const {id, name, roleId, isVerified} = user;
         const accessToken = jwt.sign({id, name, email, roleId}, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: "7d"
         });
@@ -244,7 +247,11 @@ export const loginUser = async (req, res) => {
         res.status(200).json({
             msg: "Login successful",
             user: {
-                id, name, email, role: {
+                id,
+                name,
+                email,
+                isVerified,
+                role: {
                     id: role.id,
                     role: role.role
                 }

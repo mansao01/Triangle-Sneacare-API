@@ -69,11 +69,12 @@ export const register = async (req, res) => {
             subject: "Account Verification",
             html: `
         <p>Hello ${name},</p>
-        <p>Please verify your email by clicking the button below:</p>
+        <p>Welcome to Triangle Sneacare! Please verify your email by clicking the button below:</p>
         <a href="http://localhost:8080/v1/verify-email/${user.id}" style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 5px;">Verify Email</a>
         <p>If you are unable to click the button, you can also copy and paste the following link into your browser:</p>
         <p>http://localhost:8080/v1/verify-email/${user.id}</p>
-        <p>Thank you!</p>
+        <p>Thank you for choosing Triangle Sneacare!</p>
+
     `
         }
 

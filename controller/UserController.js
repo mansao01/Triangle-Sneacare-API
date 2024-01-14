@@ -70,11 +70,10 @@ export const register = async (req, res) => {
             html: `
         <p>Hello ${name},</p>
         <p>Welcome to Triangle Sneacare! Please verify your email by clicking the button below:</p>
-        <a href="http://localhost:8080/v1/verify-email/${user.id}" style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 5px;">Verify Email</a>
+        <a href="https://triangle-api-dot-coffeebid-capstone.et.r.appspot.com/v1/verify-email/${user.id}" style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 5px;">Verify Email</a>
         <p>If you are unable to click the button, you can also copy and paste the following link into your browser:</p>
-        <p>http://localhost:8080/v1/verify-email/${user.id}</p>
+        <p>https://triangle-api-dot-coffeebid-capstone.et.r.appspot.com/v1/verify-email/${user.id}</p>
         <p>Thank you for choosing Triangle Sneacare!</p>
-
     `
         }
 
@@ -144,13 +143,6 @@ export const registerDriver = async (req, res) => {
 
         let transporter = nodemailer.createTransport(config);
 
-        let message = {
-            from: process.env.GMAIL_APP_USER,
-            to: email,
-            subject: "Welcome to Triangle Sneaker",
-            text: "You have successfully registered as driver in Triangle Sneaker"
-        }
-
 
         if (password.length < 6) {
             return res.status(400).json({msg: "Password must be at least 6 characters long"});
@@ -192,6 +184,20 @@ export const registerDriver = async (req, res) => {
                         role: role.role
                     }
                 };
+
+                let message = {
+                    from: process.env.GMAIL_APP_USER,
+                    to: email,
+                    subject: "Account verification",
+                    html: `
+                        <p>Hello ${name},</p>
+                        <p>Welcome to Triangle Sneacare! Please verify your email by clicking the button below to register as driver:</p>
+                        <a href="https://triangle-api-dot-coffeebid-capstone.et.r.appspot.com/v1/verify-email/${user.id}" style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 5px;">Verify Email</a>
+                        <p>If you are unable to click the button, you can also copy and paste the following link into your browser:</p>
+                        <p>https://triangle-api-dot-coffeebid-capstone.et.r.appspot.com/v1/verify-email/${user.id}</p>
+                        <p>Thank you for choosing Triangle Sneacare!</p>
+                         `
+                }
 
                 transporter.sendMail(message).then((info) => {
                     return res.status(201).json({
@@ -270,7 +276,6 @@ export const loginUser = async (req, res) => {
     }
 }
 
-
 export const updateUser = async (req, res) => {
     upload.single('image')(req, res, async (err) => {
         if (err) {
@@ -311,6 +316,7 @@ export const updateUser = async (req, res) => {
 
     })
 }
+
 export const logoutUser = async (req, res) => {
     try {
         const {refreshToken} = req.body;

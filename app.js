@@ -38,7 +38,7 @@ app.get("/v1/test", (req, res) => {
 })
 
 
-const PORT = process.env.PORT || 7000
+const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
     console.log("Server start in " + PORT + " Port")
 })

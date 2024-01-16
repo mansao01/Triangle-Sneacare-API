@@ -9,6 +9,7 @@ import ProductRoute from "./routes/ProductRoute.js";
 import TransactionRoute from "./routes/TransactionRoute.js";
 import CartRoute from "./routes/CartRoute.js";
 import CheckoutRoute from "./routes/CheckoutRoute.js";
+import router from "./routes/UserRoute.js";
 
 dotEnv.config()
 const app = express()
@@ -33,8 +34,12 @@ app.use(CheckoutRoute)
 app.get("/", (req, res) => {
     res.status(201).json({msg: "welcome to triangle sneacare api"})
 })
+router.get("/v1/test", (req, res) => {
+    res.status(201).json({msg: "welcome to triangle sneacare api"})
+})
 
-const PORT = process.env.PORT || 8080
+
+const PORT = process.env.PORT || 7000
 app.listen(PORT, () => {
     console.log("Server start in " + PORT + " Port")
 })

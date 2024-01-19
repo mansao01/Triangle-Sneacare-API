@@ -3,11 +3,11 @@ import db from "../config/Database.js";
 import UserModel from "./UserModel.js";
 
 
-const AddressModel = db.define("address", {
+const CustomerAddressModel = db.define("customerAddress", {
     title: {
         type: DataTypes.STRING
     },
-    detail: {
+    fullAddress: {
         type: DataTypes.STRING
     },
     latitude: {
@@ -16,15 +16,18 @@ const AddressModel = db.define("address", {
     longitude: {
         type: DataTypes.DOUBLE
     },
+    notes: {
+        type: DataTypes.STRING
+    },
 })
 
-UserModel.belongsTo(AddressModel)
+UserModel.belongsTo(CustomerAddressModel)
 
-AddressModel.hasMany(UserModel, {
+CustomerAddressModel.hasMany(UserModel, {
     foreignKey: "userId",
     onDelete: "cascade",
     onUpdate: "cascade"
 })
 
 
-export default AddressModel
+export default CustomerAddressModel

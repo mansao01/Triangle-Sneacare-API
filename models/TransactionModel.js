@@ -37,7 +37,7 @@ TransactionModel.belongsTo(UserModel)
 TransactionModel.belongsTo(ProductModel)
 TransactionModel.belongsTo(CartModel)
 
-ProductModel.hasMany(TransactionModel, {
+UserModel.hasMany(TransactionModel, {
     foreignKey: "userId",
     onDelete: "cascade",
     onUpdate: "cascade"

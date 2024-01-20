@@ -9,6 +9,7 @@ import ProductRoute from "./routes/ProductRoute.js";
 import TransactionRoute from "./routes/TransactionRoute.js";
 import CartRoute from "./routes/CartRoute.js";
 import CheckoutRoute from "./routes/CheckoutRoute.js";
+import LocationRoute from "./routes/LocationRoute.js";
 
 dotEnv.config()
 const app = express()
@@ -29,6 +30,7 @@ app.use(ProductRoute)
 app.use(TransactionRoute)
 app.use(CartRoute)
 app.use(CheckoutRoute)
+app.use(LocationRoute)
 
 app.get("/", (req, res) => {
     res.status(201).json({msg: "welcome to triangle sneacare api"})

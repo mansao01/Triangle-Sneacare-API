@@ -3,7 +3,7 @@ import db from "../config/Database.js";
 import UserModel from "./UserModel.js";
 
 
-const CustomerAddressModel = db.define("customerAddress", {
+const CustomerAddressModel = db.define("customer_address", {
     title: {
         type: DataTypes.STRING
     },
@@ -21,13 +21,9 @@ const CustomerAddressModel = db.define("customerAddress", {
     },
 })
 
-UserModel.belongsTo(CustomerAddressModel)
+CustomerAddressModel.belongsTo(UserModel)
 
-CustomerAddressModel.hasMany(UserModel, {
-    foreignKey: "userId",
-    onDelete: "cascade",
-    onUpdate: "cascade"
-})
+UserModel.hasMany(CustomerAddressModel)
 
 
 export default CustomerAddressModel

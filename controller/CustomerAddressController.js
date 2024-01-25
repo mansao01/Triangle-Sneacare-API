@@ -37,3 +37,20 @@ export const createCustomerAddress = async (req, res) => {
     }
 };
 
+
+export const getCustomerAddresses = async (req, res) => {
+    const id = req.user.id;
+
+    try {
+        const customerAddress = await CustomerAddressModel.findAll({
+            where: {userId: id},
+        });
+
+        return res.status(200).json({
+            message: "Success",
+            address: customerAddress,
+        });
+    }catch (e) {
+
+    }
+}

@@ -7,6 +7,12 @@ const CustomerAddressModel = db.define("customer_address", {
     title: {
         type: DataTypes.STRING
     },
+    receiverName: {
+        type: DataTypes.STRING
+    },
+    phone: {
+        type: DataTypes.STRING
+    },
     fullAddress: {
         type: DataTypes.STRING
     },

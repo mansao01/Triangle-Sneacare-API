@@ -3,7 +3,7 @@ import CustomerAddressModel from "../models/CustomerAddressModel.js";
 
 
 export const createCustomerAddress = async (req, res) => {
-    const {title, fullAddress, note} = req.body;
+    const {title, receiverName, phone, fullAddress, note} = req.body;
     const id = req.user.id;
     const apiKey = process.env.MAP_KEY;
 
@@ -18,6 +18,8 @@ export const createCustomerAddress = async (req, res) => {
 
         const customerAddress = await CustomerAddressModel.create({
             title: title,
+            receiverName: receiverName,
+            phone: phone,
             fullAddress: fullAddress,
             latitude: lat,
             longitude: lng,
@@ -50,7 +52,7 @@ export const getCustomerAddresses = async (req, res) => {
             message: "Success",
             address: customerAddress,
         });
-    }catch (e) {
+    } catch (e) {
 
     }
 }

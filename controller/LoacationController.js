@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const geoCode = async (req, res) => {
+export const geoCodeWithAddress = async (req, res) => {
     const address = req.query.address;
     if (!address) {
         return res.status(400).json({
@@ -25,6 +25,30 @@ export const geoCode = async (req, res) => {
     }
 }
 
+export const geoCodeWithPlaceId = async (req, res) => {
+    const placeId = req.query.placeId;
+    if (!placeId) {
+        return res.status(400).json({
+            message: "Place id is required"
+        })
+    }
+    const apiKey = process.env.MAP_KEY;
+    const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?place_id=${placeId}&key=${apiKey}`;
+
+    try {
+        const response = await axios.get(apiUrl);
+        const result = response.data
+
+        res.status(200).json({
+            message: "Success",
+            data: result
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message
+        })
+    }
+}
 
 export const autoCompleteAddress = async (req, res) => {
     const address = req.query.address;

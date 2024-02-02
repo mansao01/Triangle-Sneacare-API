@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 import ImgUpload from "../modules/imgUpload.js";
 import multer from "multer";
 import userModel from "../models/UserModel.js";
+import {where} from "sequelize";
 
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
@@ -325,7 +326,7 @@ export const sendResetPasswordRequest = async (req, res) => {
         })
     } catch (error) {
         console.error('Error sending email:', error);
-        return res.status(500).json({ msg: error.message });
+        return res.status(500).json({msg: error.message});
     }
 
 }
@@ -459,6 +460,34 @@ export const getProfile = async (req, res) => {
     }
 };
 
+export const getUserDetailById = async (req, res) => {
+    try {
+        const id = req.user.id;
+        const user = await UserModel.findOne({
+            where: {
+                id: id
+            }
+        })
+
+        if (!user) {
+            return res.status(404).json({msg: "User not found"});
+        }
+
+
+        const userResponse = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.pictureUrl,
+            phone: user.phone,
+        }
+
+        res.status(200).json({msg: "Success", user: userResponse})
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(500).json({msg: "Internal server error"});
+    }
+}
 
 export const getDrivers = async (req, res) => {
     try {

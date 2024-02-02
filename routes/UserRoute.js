@@ -8,7 +8,8 @@ import {
     register,
     registerDriver, resetPassword,
     sendResetPasswordRequest,
-    updateUser, verifyEmail
+    updateUser, verifyEmail,
+    getUserDetailById
 } from "../controller/UserController.js";
 import {authMiddleware} from "../middleware/Auth.js";
 
@@ -20,6 +21,7 @@ router.post("/v1/login", loginUser)
 router.patch("/v1/updateUser", authMiddleware, updateUser)
 router.post("/v1/logout", logoutUser)
 router.get("/v1/profile", authMiddleware, getProfile)
+router.get("/v1/profile/detail", authMiddleware, getUserDetailById)
 
 router.get("/v1/verify-email/:id", verifyEmail)
 

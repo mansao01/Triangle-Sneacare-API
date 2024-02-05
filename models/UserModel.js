@@ -41,6 +41,11 @@ const UserModel = db.define("user", {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
+    totalTransaction: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    }
+//     add total transaction
 }, {
     freezeTableName: true
 })

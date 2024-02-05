@@ -69,3 +69,26 @@ export const autoCompleteAddress = async (req, res) => {
         })
     }
 }
+
+
+export const calculateDistance = async (req, res) => {
+
+    const origin = req.query.origin;
+    const destination = "-6.8060505,110.8290513"; // triangle latLng
+    const apiKey = process.env.MAP_KEY;
+    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=${apiKey}`
+
+    try {
+        const response = await axios.get(apiUrl);
+        const result = response.data
+
+        res.status(200).json({
+            message: "Success",
+            data: result
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message
+        })
+    }
+}

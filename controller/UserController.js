@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
 import ImgUpload from "../modules/imgUpload.js";
 import multer from "multer";
 import userModel from "../models/UserModel.js";
-import {where} from "sequelize";
+
 
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
@@ -500,6 +500,27 @@ export const getDrivers = async (req, res) => {
         res.status(200).json({msg: "Success", drivers})
     } catch (error) {
         console.error("Error fetching drivers:", error);
+        res.status(500).json({msg: "Internal server error"});
+    }
+}
+
+
+export const addSuccessTransactionCount = async (req, res) => {
+
+    const id = req.user.id;
+    const {productCount} = req.query;
+
+    try {
+
+        await UserModel.increment('totalTransaction', {
+            by: productCount,
+            where: { id: id }
+        });
+
+        res.status(200).json({ msg: "Transaction count updated successfully" });
+
+
+    }catch (e) {
         res.status(500).json({msg: "Internal server error"});
     }
 }

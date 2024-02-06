@@ -53,6 +53,46 @@ export const getCustomerAddresses = async (req, res) => {
             address: customerAddress,
         });
     } catch (e) {
+    }
+}
 
+export const updateCustomerAddress = async (req, res) => {
+    const {id, title, receiverName, phone, fullAddress, note} = req.query;
+    const userId = req.user.id;
+    const apiKey = process.env.MAP_KEY;
+
+    try {
+        const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${fullAddress}&key=${apiKey}`;
+
+        const response = await axios.get(apiUrl);
+        const result = response.data;
+
+        // Access latitude and longitude
+        const {lat, lng} = result.results[0].geometry.location;
+
+        const customerAddress = await CustomerAddressModel.update({
+            title: title,
+            receiverName: receiverName,
+            phone: phone,
+            fullAddress: fullAddress,
+            latitude: lat,
+            longitude: lng,
+            notes: note,
+        }, {
+            where: {
+                id: id,
+                userId: userId,
+            },
+        });
+
+        return res.status(200).json({
+            message: "Address updated successfully",
+            address: customerAddress,
+        });
+    } catch (error) {
+        console.error("Error updating customer address:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+        });
     }
 }

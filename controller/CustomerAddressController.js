@@ -96,3 +96,28 @@ export const updateCustomerAddress = async (req, res) => {
         });
     }
 }
+
+
+export const deleteCustomerAddress = async (req, res) => {
+    const {id} = req.query;
+    const userId = req.user.id;
+
+    try {
+        const customerAddress = await CustomerAddressModel.destroy({
+            where: {
+                id: id,
+                userId: userId,
+            }
+        });
+
+        return res.status(200).json({
+            message: "Address deleted successfully",
+            address: customerAddress,
+        });
+    } catch (error) {
+        console.error("Error deleting customer address:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+}

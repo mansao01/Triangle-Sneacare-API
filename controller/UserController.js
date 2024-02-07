@@ -222,39 +222,48 @@ export const registerDriver = async (req, res) => {
 
 };
 
+const generateTokens = ({ id, name, email, roleId }) => {
+    const accessToken = jwt.sign({ id, name, email, roleId }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "15m" // Example: Access token expires in 15 minutes
+    });
+
+    const refreshToken = jwt.sign({ id, name, email, roleId }, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: "7d" // Example: Refresh token expires in 7 days
+    });
+
+    return { accessToken, refreshToken };
+};
 
 export const loginUser = async (req, res) => {
     try {
-        const {email, password} = req.body;
+        const { email, password } = req.body;
 
         const user = await UserModel.findOne(
-            {where: {email}}
+            { where: { email } }
         );
 
         if (!user) {
-            return res.status(400).json({msg: "Email not found"});
+            return res.status(400).json({ msg: "Email not found" });
         }
 
         if (!user.isVerified) {
-            return res.status(400).json({msg: "Please verify your email first, check your email"});
+            return res.status(400).json({ msg: "Please verify your email first, check your email" });
         }
+
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            return res.status(400).json({msg: "Wrong password"});
+            return res.status(400).json({ msg: "Wrong password" });
         }
 
-        const {id, name, roleId, isVerified} = user;
-        const accessToken = jwt.sign({id, name, email, roleId}, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: "7d"
-        });
+        const { id, name, roleId, isVerified } = user;
 
-        const refreshToken = jwt.sign({id, name, email, roleId}, process.env.REFRESH_TOKEN_SECRET, {
-            expiresIn: "7d"
-        });
+        // Generate tokens
+        const { accessToken, refreshToken } = generateTokens({ id, name, email, roleId });
 
-        await UserModel.update({refresh_token: refreshToken}, {
-            where: {id}
+        // Update refresh token in the database
+        await UserModel.update({ refresh_token: refreshToken }, {
+            where: { id }
         });
 
         const role = await RoleModel.findByPk(roleId);
@@ -269,14 +278,15 @@ export const loginUser = async (req, res) => {
                     id: role.id,
                     role: role.role
                 }
-            }, accessToken, refreshToken
+            },
+            accessToken,
+            refreshToken
         });
     } catch (error) {
         console.error(error);
-        res.status(400).json({msg: "Login failed due to an error"});
+        res.status(400).json({ msg: "Login failed due to an error" });
     }
-}
-
+};
 export const sendResetPasswordRequest = async (req, res) => {
     const email = req.body.email;
     let config = {
@@ -522,5 +532,45 @@ export const addSuccessTransactionCount = async (req, res) => {
 
     }catch (e) {
         res.status(500).json({msg: "Internal server error"});
+    }
+}
+
+
+export const refreshAccessToken = async (req, res) => {
+    try {
+        const { refreshToken } = req.query;
+        if (!refreshToken) {
+            return res.status(400).json({ msg: "Refresh token not found" });
+        }
+
+        // Verify the refresh token
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ msg: "Invalid refresh token" });
+            }
+
+            // Find the user based on the decoded refresh token
+            const user = await UserModel.findOne({
+                where: {
+                    id: decoded.id,
+                    refresh_token: refreshToken
+                }
+            });
+
+            if (!user) {
+                return res.status(401).json({ msg: "User not found or refresh token invalid" });
+            }
+
+            // Generate a new access token
+            const accessToken = jwt.sign({ id: user.id, name: user.name, email: user.email, roleId: user.roleId }, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: "15m" // Example: New access token expires in 15 minutes
+            });
+
+            // Send the new access token in the response
+            res.status(200).json({ accessToken });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Internal server error" });
     }
 }

@@ -12,12 +12,13 @@ import {
     getUserDetailById, addSuccessTransactionCount, refreshAccessToken
 } from "../controller/UserController.js";
 import {authMiddleware} from "../middleware/Auth.js";
+import {signInLimiter} from "../middleware/RateLimiter.js";
 
 const router = express.Router();
 
 router.post("/v1/register", register)
 router.post("/v1/registerDriver", registerDriver)
-router.post("/v1/login", loginUser)
+router.post("/v1/login", signInLimiter, loginUser)
 router.post("/v1/token", refreshAccessToken)
 
 router.patch("/v1/updateUser", authMiddleware, updateUser)

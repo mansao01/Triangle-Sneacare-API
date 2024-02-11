@@ -53,9 +53,37 @@ export const getCustomerAddresses = async (req, res) => {
             address: customerAddress,
         });
     } catch (e) {
+        res.status(500).json({
+            message: "Internal server error",
+        });
+
     }
 }
+export const getDetailCustomerAddress = async (req, res) => {
+    const userId = req.user.id;
+    const addressId = req.query.addressId;
 
+    try {
+        const customerAddress = await CustomerAddressModel.findOne({
+            where: {
+                id: addressId,
+                userId: userId,
+            },
+        })
+
+        return res.status(200).json({
+            message: "Success",
+            address: customerAddress,
+        });
+    } catch (e) {
+        res.status(500).json({
+            message: e.message,
+        });
+
+    }
+
+
+}
 export const updateCustomerAddress = async (req, res) => {
     const {id, title, receiverName, phone, fullAddress, note} = req.query;
     const userId = req.user.id;

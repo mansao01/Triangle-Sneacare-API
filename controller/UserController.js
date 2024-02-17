@@ -228,7 +228,7 @@ const generateTokens = ({ id, name, email, roleId }) => {
     });
 
     const refreshToken = jwt.sign({ id, name, email, roleId }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "7d" // Example: Refresh token expires in 7 days
+        expiresIn: "30d" // Example: Refresh token expires in 30 days
     });
 
     return { accessToken, refreshToken };

@@ -6,6 +6,8 @@ import nodemailer from "nodemailer";
 import ImgUpload from "../modules/imgUpload.js";
 import multer from "multer";
 import userModel from "../models/UserModel.js";
+import {nanoid} from "nanoid";
+import OTP from "otp.js"
 
 
 const storage = multer.memoryStorage();
@@ -287,93 +289,7 @@ export const loginUser = async (req, res) => {
         res.status(400).json({ msg: "Login failed due to an error" });
     }
 };
-export const sendResetPasswordRequest = async (req, res) => {
-    const email = req.body.email;
-    let config = {
-        host: "smtp.gmail.com",
-        service: "gmail",
-        auth: {
-            user: process.env.GMAIL_APP_USER,
-            pass: process.env.GMAIL_APP_PASSWORD
-        }
-    }
 
-    if (!email) {
-        return res.status(400).json({msg: "Email not registered"});
-    }
-
-    try {
-        const user = await UserModel.findOne({
-            where: {
-                email: email
-            }
-        })
-
-        let transporter = nodemailer.createTransport(config);
-        let message = {
-            from: process.env.GMAIL_APP_USER,
-            to: email,
-            subject: "Password Reset Request",
-            html: `
-            <p>Hello ${user.name},</p>
-            <p>We received a request to reset your password. Please click the button below to proceed with the reset:</p>
-            <a href="https://triangle-api-dot-coffeebid-capstone.et.r.appspot.com/v1/reset-password" style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 5px;">Reset Password</a>
-            <p>If you are unable to click the button, you can also copy and paste the following link into your browser:</p>
-            <p>https://triangle-api-dot-coffeebid-capstone.et.r.appspot.com/v1/reset-password</p>
-            <p>If you didn't request this password reset, please ignore this email.</p>
-            <p>Thank you for choosing Triangle Sneacare!</p>
-        `
-        };
-        transporter.sendMail(message).then((info) => {
-            return res.status(200).json({
-                msg: "Reset password request sent to your email",
-                info: info.messageId,
-                preview: nodemailer.getTestMessageUrl(info)
-            })
-        }).catch((err) => {
-            console.error(err); // Log the error for debugging purposes
-            return res.status(500).json({msg: err.message}); // Respond with the error message
-        })
-    } catch (error) {
-        console.error('Error sending email:', error);
-        return res.status(500).json({msg: error.message});
-    }
-
-}
-
-export const resetPassword = async (req, res) => {
-    const {email, password} = req.body;
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    if (password.length < 6) {
-        return res.status(400).json({msg: "Password must be at least 6 characters long"});
-    }
-
-    try {
-        const user = await UserModel.findOne({
-            where: {
-                email: email
-            }
-        })
-
-        if (!user) {
-            return res.status(400).json({msg: "User not found"});
-        } else {
-            await userModel.update({
-                password: hashedPassword
-            }, {
-                where: {
-                    email: email
-                }
-            })
-        }
-
-        res.status(200).json({msg: "Password reset successfully"})
-    } catch (e) {
-        res.status(400).json({msg: e})
-    }
-}
 
 export const updateUser = async (req, res) => {
     upload.single('image')(req, res, async (err) => {
@@ -573,4 +489,143 @@ export const refreshAccessToken = async (req, res) => {
         console.error(error);
         res.status(500).json({ msg: "Internal server error" });
     }
+}
+
+export const sendResetPasswordRequest = async (req, res) => {
+    const email = req.body.email;
+    let config = {
+        host: "smtp.gmail.com",
+        service: "gmail",
+        auth: {
+            user: process.env.GMAIL_APP_USER,
+            pass: process.env.GMAIL_APP_PASSWORD
+        }
+    }
+
+    if (!email) {
+        return res.status(400).json({msg: "Email not registered"});
+    }
+
+    try {
+        const user = await UserModel.findOne({
+            where: {
+                email: email
+            }
+        })
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        // Generate OTP
+        const otpSecret = generateOTPSecret();
+        const otp = generatedOTP(otpSecret);
+
+        // Store OTP in the database
+        user.otp = otp;
+        await user.save();
+
+        let transporter = nodemailer.createTransport(config);
+        let message = {
+            from: process.env.GMAIL_APP_USER,
+            to: email,
+            subject: "Password Reset Request",
+            html: `
+            <p>Hello ${user.name},</p>
+            <p>We received a request to reset your password. Please use the following one-time password to proceed with the reset:</p>
+            <p>OTP: <strong>${otp}</strong></p>
+            <p>If you didn't request this password reset, please ignore this email.</p>
+            <p>Thank you for choosing Triangle Sneacare!</p>
+        `
+        };
+
+        transporter.sendMail(message).then((info) => {
+            return res.status(200).json({
+                msg: "Reset password request sent to your email",
+                info: info.messageId,
+                preview: nodemailer.getTestMessageUrl(info)
+            })
+        }).catch((err) => {
+            console.error(err); // Log the error for debugging purposes
+            return res.status(500).json({msg: err.message}); // Respond with the error message
+        })
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).json({msg: error.message});
+    }
+}
+
+export const verifyOTP = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const user = await UserModel.findOne({
+            where: {
+                email: email
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        if (user.otp !== otp) {
+            return res.status(400).json({ msg: "Invalid OTP" });
+        }
+
+        // Clear the OTP from the user object after successful verification
+        user.otp = null; // Assuming you stored OTP in the `otp` field
+        await user.save();
+
+        return res.status(200).json({ msg: "OTP verified successfully" });
+    } catch (error) {
+        console.error('Error verifying OTP:', error);
+        return res.status(500).json({ msg: error.message });
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    const {email, password} = req.body;
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    if (password.length < 6) {
+        return res.status(400).json({msg: "Password must be at least 6 characters long"});
+    }
+
+    try {
+        const user = await UserModel.findOne({
+            where: {
+                email: email
+            }
+        })
+
+        if (!user) {
+            return res.status(400).json({msg: "User not found"});
+        } else {
+            await userModel.update({
+                password: hashedPassword
+            }, {
+                where: {
+                    email: email
+                }
+            })
+        }
+
+        res.status(200).json({msg: "Password reset successfully"})
+    } catch (e) {
+        res.status(400).json({msg: e})
+    }
+}
+function generateOTPSecret(){
+    return nanoid(16)
+}
+
+function generatedOTP(secret){
+    const totp = OTP.totp({
+        secret:secret,
+        digits:6,
+        period:120
+    })
+    return totp.getToken()
 }

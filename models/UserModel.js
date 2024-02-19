@@ -44,8 +44,10 @@ const UserModel = db.define("user", {
     totalTransaction: {
         type: DataTypes.INTEGER,
         defaultValue: 0
+    },
+    otp:{
+        type:DataTypes.STRING
     }
-//     add total transaction
 }, {
     freezeTableName: true
 })

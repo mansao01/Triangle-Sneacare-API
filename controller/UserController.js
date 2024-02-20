@@ -1,13 +1,12 @@
 import UserModel from "../models/UserModel.js";
+import userModel from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import RoleModel from "../models/RoleModel.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import ImgUpload from "../modules/imgUpload.js";
 import multer from "multer";
-import userModel from "../models/UserModel.js";
-import {nanoid} from "nanoid";
-import OTP from "otp.js"
+import {nanoid, customAlphabet} from "nanoid";
 
 
 const storage = multer.memoryStorage();
@@ -492,7 +491,7 @@ export const refreshAccessToken = async (req, res) => {
 }
 
 export const sendResetPasswordRequest = async (req, res) => {
-    const email = req.body.email;
+    const email = req.query.email;
     let config = {
         host: "smtp.gmail.com",
         service: "gmail",
@@ -518,8 +517,7 @@ export const sendResetPasswordRequest = async (req, res) => {
         }
 
         // Generate OTP
-        const otpSecret = generateOTPSecret();
-        const otp = generatedOTP(otpSecret);
+        const otp = generateOTPSecret();
 
         // Store OTP in the database
         user.otp = otp;
@@ -556,7 +554,7 @@ export const sendResetPasswordRequest = async (req, res) => {
 }
 
 export const verifyOTP = async (req, res) => {
-    const { email, otp } = req.body;
+    const { email, otp } = req.query;
 
     try {
         const user = await UserModel.findOne({
@@ -617,15 +615,10 @@ export const resetPassword = async (req, res) => {
         res.status(400).json({msg: e})
     }
 }
-function generateOTPSecret(){
-    return nanoid(16)
-}
 
-function generatedOTP(secret){
-    const totp = OTP.totp({
-        secret:secret,
-        digits:6,
-        period:120
-    })
-    return totp.getToken()
+function generateOTPSecret(){
+    const alphabet = process.env.SECRET_OTP; // Define the alphabet including uppercase letters and digits
+    const nanoid = customAlphabet(alphabet, 6); // Create a custom nanoid generator using the defined alphabet
+    const secret = nanoid(); // Generate a secret string
+    return secret.toUpperCase();
 }

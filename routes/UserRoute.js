@@ -9,7 +9,7 @@ import {
     registerDriver, resetPassword,
     sendResetPasswordRequest,
     updateUser, verifyEmail,
-    getUserDetailById, addSuccessTransactionCount, refreshAccessToken
+    getUserDetailById, addSuccessTransactionCount, refreshAccessToken, verifyOTP
 } from "../controller/UserController.js";
 import {authMiddleware} from "../middleware/Auth.js";
 import {signInLimiter} from "../middleware/RateLimiter.js";
@@ -33,6 +33,7 @@ router.get("/v1/verify-email/:id", verifyEmail)
 router.get("/v1/drivers", getDrivers)
 
 router.post("/v1/sendResetPassword", sendResetPasswordRequest)
+router.post("/v1/verifyOtp", verifyOTP)
 router.patch("/v1/resetPassword", resetPassword)
 
 

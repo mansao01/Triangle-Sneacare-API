@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import ImgUpload from "../modules/imgUpload.js";
 import multer from "multer";
-import {nanoid, customAlphabet} from "nanoid";
+import {customAlphabet} from "nanoid";
 
 
 const storage = multer.memoryStorage();
@@ -223,48 +223,48 @@ export const registerDriver = async (req, res) => {
 
 };
 
-const generateTokens = ({ id, name, email, roleId }) => {
-    const accessToken = jwt.sign({ id, name, email, roleId }, process.env.ACCESS_TOKEN_SECRET, {
+const generateTokens = ({id, name, email, roleId}) => {
+    const accessToken = jwt.sign({id, name, email, roleId}, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "15m" // Example: Access token expires in 15 minutes
     });
 
-    const refreshToken = jwt.sign({ id, name, email, roleId }, process.env.REFRESH_TOKEN_SECRET, {
+    const refreshToken = jwt.sign({id, name, email, roleId}, process.env.REFRESH_TOKEN_SECRET, {
         expiresIn: "30d" // Example: Refresh token expires in 30 days
     });
 
-    return { accessToken, refreshToken };
+    return {accessToken, refreshToken};
 };
 
 export const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const {email, password} = req.body;
 
         const user = await UserModel.findOne(
-            { where: { email } }
+            {where: {email}}
         );
 
         if (!user) {
-            return res.status(400).json({ msg: "Email not found" });
+            return res.status(400).json({msg: "Email not found"});
         }
 
         if (!user.isVerified) {
-            return res.status(400).json({ msg: "Please verify your email first, check your email" });
+            return res.status(400).json({msg: "Please verify your email first, check your email"});
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            return res.status(400).json({ msg: "Wrong password" });
+            return res.status(400).json({msg: "Wrong password"});
         }
 
-        const { id, name, roleId, isVerified } = user;
+        const {id, name, roleId, isVerified} = user;
 
         // Generate tokens
-        const { accessToken, refreshToken } = generateTokens({ id, name, email, roleId });
+        const {accessToken, refreshToken} = generateTokens({id, name, email, roleId});
 
         // Update refresh token in the database
-        await UserModel.update({ refresh_token: refreshToken }, {
-            where: { id }
+        await UserModel.update({refresh_token: refreshToken}, {
+            where: {id}
         });
 
         const role = await RoleModel.findByPk(roleId);
@@ -285,7 +285,7 @@ export const loginUser = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(400).json({ msg: "Login failed due to an error" });
+        res.status(400).json({msg: "Login failed due to an error"});
     }
 };
 
@@ -439,13 +439,13 @@ export const addSuccessTransactionCount = async (req, res) => {
 
         await UserModel.increment('totalTransaction', {
             by: productCount,
-            where: { id: id }
+            where: {id: id}
         });
 
-        res.status(200).json({ msg: "Transaction count updated successfully" });
+        res.status(200).json({msg: "Transaction count updated successfully"});
 
 
-    }catch (e) {
+    } catch (e) {
         res.status(500).json({msg: "Internal server error"});
     }
 }
@@ -453,15 +453,15 @@ export const addSuccessTransactionCount = async (req, res) => {
 
 export const refreshAccessToken = async (req, res) => {
     try {
-        const { refreshToken } = req.query;
+        const {refreshToken} = req.query;
         if (!refreshToken) {
-            return res.status(400).json({ msg: "Refresh token not found" });
+            return res.status(400).json({msg: "Refresh token not found"});
         }
 
         // Verify the refresh token
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
             if (err) {
-                return res.status(401).json({ msg: "Invalid refresh token" });
+                return res.status(401).json({msg: "Invalid refresh token"});
             }
 
             // Find the user based on the decoded refresh token
@@ -473,20 +473,25 @@ export const refreshAccessToken = async (req, res) => {
             });
 
             if (!user) {
-                return res.status(401).json({ msg: "User not found or refresh token invalid" });
+                return res.status(401).json({msg: "User not found or refresh token invalid"});
             }
 
             // Generate a new access token
-            const accessToken = jwt.sign({ id: user.id, name: user.name, email: user.email, roleId: user.roleId }, process.env.ACCESS_TOKEN_SECRET, {
+            const accessToken = jwt.sign({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                roleId: user.roleId
+            }, process.env.ACCESS_TOKEN_SECRET, {
                 expiresIn: "15m" // Example: New access token expires in 15 minutes
             });
 
             // Send the new access token in the response
-            res.status(200).json({ accessToken });
+            res.status(200).json({accessToken});
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: "Internal server error" });
+        res.status(500).json({msg: "Internal server error"});
     }
 }
 
@@ -513,7 +518,7 @@ export const sendResetPasswordRequest = async (req, res) => {
         })
 
         if (!user) {
-            return res.status(404).json({ msg: "User not found" });
+            return res.status(404).json({msg: "User not found"});
         }
 
         // Generate OTP
@@ -554,7 +559,7 @@ export const sendResetPasswordRequest = async (req, res) => {
 }
 
 export const verifyOTP = async (req, res) => {
-    const { email, otp } = req.query;
+    const {email, otp} = req.query;
 
     try {
         const user = await UserModel.findOne({
@@ -564,21 +569,21 @@ export const verifyOTP = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(404).json({ msg: "User not found" });
+            return res.status(404).json({msg: "User not found"});
         }
 
         if (user.otp !== otp) {
-            return res.status(400).json({ msg: "Invalid OTP" });
+            return res.status(400).json({msg: "Invalid OTP"});
         }
 
         // Clear the OTP from the user object after successful verification
         user.otp = null; // Assuming you stored OTP in the `otp` field
         await user.save();
 
-        return res.status(200).json({ msg: "OTP verified successfully" });
+        return res.status(200).json({msg: "OTP verified successfully"});
     } catch (error) {
         console.error('Error verifying OTP:', error);
-        return res.status(500).json({ msg: error.message });
+        return res.status(500).json({msg: error.message});
     }
 }
 
@@ -616,7 +621,7 @@ export const resetPassword = async (req, res) => {
     }
 }
 
-function generateOTPSecret(){
+function generateOTPSecret() {
     const alphabet = process.env.SECRET_OTP; // Define the alphabet including uppercase letters and digits
     const nanoid = customAlphabet(alphabet, 6); // Create a custom nanoid generator using the defined alphabet
     const secret = nanoid(); // Generate a secret string

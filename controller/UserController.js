@@ -588,8 +588,10 @@ export const verifyOTP = async (req, res) => {
 }
 
 export const resetPassword = async (req, res) => {
-    const {email, password} = req.body;
+    const {email, password, confirmPassword} = req.query;
     const salt = await bcrypt.genSalt();
+    if (password !== confirmPassword) return res.status(400).json({msg: "Password and Confirm Password not match"});
+
     const hashedPassword = await bcrypt.hash(password, salt);
 
     if (password.length < 6) {

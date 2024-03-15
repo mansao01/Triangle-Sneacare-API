@@ -12,7 +12,18 @@ const CheckoutModel = db.define("checkout", {
         type:DataTypes.STRING, //pickup or delivery to customer
         allowNull: false
     },
-
+    paymentMethod:{
+        type:DataTypes.STRING, //cash or online
+        allowNull: false
+    },
+    paymentStatus:{
+        type:DataTypes.STRING, //pending or paid
+        allowNull: false
+    },
+    deliveryStatus:{
+        type:DataTypes.STRING, //pending, delivering, delivered
+        allowNull: false
+    },
 }, {
     freezeTableName: true
 })

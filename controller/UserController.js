@@ -225,11 +225,11 @@ export const registerDriver = async (req, res) => {
 
 const generateTokens = ({id, name, email, roleId}) => {
     const accessToken = jwt.sign({id, name, email, roleId}, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "15m" // Example: Access token expires in 15 minutes
+        expiresIn: "15m"
     });
 
     const refreshToken = jwt.sign({id, name, email, roleId}, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "30d" // Example: Refresh token expires in 30 days
+        expiresIn: "30d"
     });
 
     return {accessToken, refreshToken};

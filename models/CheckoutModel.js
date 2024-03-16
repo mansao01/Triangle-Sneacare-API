@@ -3,6 +3,7 @@ import db from "../config/Database.js";
 import CartModel from "./CartModel.js";
 import CustomerAddressModel from "./CustomerAddressModel.js";
 
+// change to transaction
 const CheckoutModel = db.define("checkout", {
     receiveByCustomer: {
         type: DataTypes.BOOLEAN,

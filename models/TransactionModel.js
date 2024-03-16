@@ -4,6 +4,7 @@ import UserModel from "./UserModel.js";
 import ProductModel from "./ProductModel.js";
 import CartModel from "./CartModel.js";
 
+// change to selectedProduct
 const TransactionModel = db.define("transaction", {
     id:{
         primaryKey: true,

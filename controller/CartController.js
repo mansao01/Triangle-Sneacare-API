@@ -1,48 +1,7 @@
-import TransactionModel from "../models/TransactionModel.js";
+import SelectedProductModel from "../models/SelectedProductModel.js";
 import CartModel from "../models/CartModel.js";
 import ProductModel from "../models/ProductModel.js";
 
-
-// export const addToCart = async (req, res) => {
-//     const { transactionId, userId } = req.body;
-//
-//     try {
-//         let [cart, created] = await CartModel.findOrCreate({
-//             where: { userId },
-//             defaults: { status: 'active' }
-//         });
-//
-//         if (created) {
-//             cart = cart[0];
-//         }
-//
-//         await TransactionModel.update(
-//             { cartId: cart.id },
-//             { where: { id: transactionId } }
-//         );
-//
-//         const itemsInCart = await TransactionModel.findAll({
-//             where: { cartId: cart.id },
-//             include: [{ model: ProductModel }] // Include ProductModel to fetch product details
-//         });
-//
-//         res.status(200).json({
-//             msg: 'Item added to cart successfully',
-//             cartId: cart.id,
-//             items: itemsInCart.map(item => ({
-//                 id: item.id,
-//                 transactionDate: item.transactionDate,
-//                 confirmed: item.confirmed,
-//                 washStatus: item.washStatus,
-//                 imageUrl: item.imageUrl,
-//                 productDetail: item.product // Product details for each item
-//             }))
-//         });
-//     } catch (error) {
-//         console.error('Error adding item to cart:', error);
-//         res.status(500).json({ msg: 'Failed to add item to cart' });
-//     }
-// };
 
 export const addToCart = async (req, res) => {
     const { transactionId, userId } = req.body;
@@ -57,12 +16,12 @@ export const addToCart = async (req, res) => {
             cart = cart[0];
         }
 
-        await TransactionModel.update(
+        await SelectedProductModel.update(
             { cartId: cart.id },
             { where: { id: transactionId } }
         );
 
-        const itemsInCart = await TransactionModel.findAll({
+        const itemsInCart = await SelectedProductModel.findAll({
             where: { cartId: cart.id },
             include: [{ model: ProductModel }]
         });
@@ -75,8 +34,6 @@ export const addToCart = async (req, res) => {
 
             return {
                 id: item.id,
-                transactionDate: item.transactionDate,
-                confirmed: item.confirmed,
                 washStatus: item.washStatus,
                 imageUrl: item.imageUrl,
                 productDetail: item.product,
@@ -105,7 +62,7 @@ export const getCart = async (req, res) => {
     try {
         const cart = await CartModel.findOne({
             where: { userId: userId },
-            include: [{ model: TransactionModel, include: [{ model: ProductModel }] }]
+            include: [{ model: SelectedProductModel, include: [{ model: ProductModel }] }]
         });
 
         if (!cart) {

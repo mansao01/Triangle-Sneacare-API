@@ -6,9 +6,9 @@ import bodyParser from "body-parser";
 import UserRoute from "./routes/UserRoute.js";
 import ItemTypeRoute from "./routes/ItemTypeRoute.js";
 import ProductRoute from "./routes/ProductRoute.js";
-import TransactionRoute from "./routes/TransactionRoute.js";
+import TransactionRoute from "./routes/SelectedProductRoute.js";
 import CartRoute from "./routes/CartRoute.js";
-import CheckoutRoute from "./routes/CheckoutRoute.js";
+import CheckoutRoute from "./routes/TransactionRoute.js";
 import LocationRoute from "./routes/LocationRoute.js";
 import CustomerAddressRoute from "./routes/CustomerAddressRoute.js";
 import {limiter} from "./middleware/RateLimiter.js";
@@ -19,7 +19,7 @@ const app = express()
 try {
     await db.authenticate()
     console.log("Database connected")
-    // await db.sync()
+    await db.sync()
 } catch (e) {
     console.log(e)
 }

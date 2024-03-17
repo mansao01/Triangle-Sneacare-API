@@ -3,7 +3,7 @@ import db from "../config/Database.js";
 import UserModel from "./UserModel.js";
 
 
-const CustomerAddressModel = db.define("customer_address", {
+const CustomerAddressModel = db.define("customerAddress", {
     title: {
         type: DataTypes.STRING
     },

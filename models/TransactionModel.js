@@ -1,50 +1,44 @@
 import {DataTypes} from "sequelize";
 import db from "../config/Database.js";
-import UserModel from "./UserModel.js";
-import ProductModel from "./ProductModel.js";
 import CartModel from "./CartModel.js";
+import CustomerAddressModel from "./CustomerAddressModel.js";
+import UserModel from "./UserModel.js";
 
-// change to selectedProduct
+// change to transaction
 const TransactionModel = db.define("transaction", {
-    id:{
-        primaryKey: true,
-        type: DataTypes.STRING,
-        defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
-        validate:{
-            notEmpty: true
-        }
-    },
-    transactionDate: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
-    confirmed: {
+    receiveByCustomer: {
         type: DataTypes.BOOLEAN,
         allowNull: false
     },
-    washStatus: {
-        type: DataTypes.STRING, //pending, cleaning, drying, ironing, packing, done
+    deliveryMethod:{
+        type:DataTypes.STRING, //pickup or delivery to customer
         allowNull: false
     },
-    imageUrl:{
-        type:DataTypes.STRING
-    }
+    paymentMethod:{
+        type:DataTypes.STRING, //cash or online
+        allowNull: false
+    },
+    paymentStatus:{
+        type:DataTypes.STRING, //pending or paid
+        allowNull: false
+    },
+    deliveryStatus:{
+        type:DataTypes.STRING, //pending, delivering, delivered
+        allowNull: false
+    },
+    transactionDate:{
+        type:DataTypes.DATE,
+        allowNull: false
+    },
 }, {
     freezeTableName: true
 })
 
-TransactionModel.belongsTo(UserModel)
-TransactionModel.belongsTo(ProductModel)
-TransactionModel.belongsTo(CartModel)
+CartModel.hasMany(TransactionModel)
+CustomerAddressModel.hasMany(TransactionModel)
 
 UserModel.hasMany(TransactionModel, {
     foreignKey: "userId",
-    onDelete: "cascade",
-    onUpdate: "cascade"
-})
-ProductModel.hasMany(TransactionModel, {
-    foreignKey: "productId",
     onDelete: "cascade",
     onUpdate: "cascade"
 })

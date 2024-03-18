@@ -27,6 +27,58 @@ export const charge = async (req, res) => {
     }
 }
 
+export const getTransactionPaymentStatus = async (req, res) => {
+    const orderId = req.query.orderId
+    const url = `https://api.sandbox.midtrans.com/v2/${orderId}/status`
+
+    try {
+        const options = {
+            method: 'GET',
+            url: url,
+            headers: {
+                accept: 'application/json',
+                authorization: 'Basic ' + base64.encode(serverKey + ':')
+            }
+        };
+        axios.request(options)
+            .then(function (response) {
+                res.status(200).json(response.data)
+            })
+            .catch(function (error) {
+                res.status(400).json(error)
+            });
+    } catch (e) {
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
+export const cancelTransaction = async (req, res) => {
+    const orderId = req.query.orderId
+    const url = `https://api.sandbox.midtrans.com/v2/${orderId}/cancel`
+
+    try {
+        const options = {
+            method: 'POST',
+            url: url,
+            headers: {
+                accept: 'application/json',
+                authorization: 'Basic ' + base64.encode(serverKey + ':')
+            }
+        };
+
+        axios
+            .request(options)
+            .then(function (response) {
+                res.status(200).json(response.data)
+            })
+            .catch(function (error) {
+                res.status(400).json(error)
+            });
+    } catch (e) {
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
 async function chargeAPI(apiUrl, serverKey, requestBody) {
     try {
         const response = await axios.post(apiUrl, requestBody, {

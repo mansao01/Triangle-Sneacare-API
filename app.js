@@ -11,7 +11,7 @@ import CartRoute from "./routes/CartRoute.js";
 import CheckoutRoute from "./routes/TransactionRoute.js";
 import LocationRoute from "./routes/LocationRoute.js";
 import CustomerAddressRoute from "./routes/CustomerAddressRoute.js";
-import {limiter} from "./middleware/RateLimiter.js";
+import PaymentRoute from "./routes/PaymentRoute.js";
 
 dotEnv.config()
 const app = express()
@@ -19,7 +19,7 @@ const app = express()
 try {
     await db.authenticate()
     console.log("Database connected")
-    await db.sync()
+    // await db.sync()
 } catch (e) {
     console.log(e)
 }
@@ -34,7 +34,7 @@ app.use(CartRoute)
 app.use(CheckoutRoute)
 app.use(LocationRoute)
 app.use(CustomerAddressRoute)
-app.use(limiter)
+app.use(PaymentRoute)
 
 app.get("/", (req, res) => {
     res.status(201).json({msg: "welcome to triangle sneacare api"})

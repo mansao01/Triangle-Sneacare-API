@@ -1,24 +1,29 @@
 import axios from "axios";
 import base64 from "base-64";
+import dotEnv from 'dotenv';
+dotEnv.config()
 
 const serverKey = process.env.MIDTRANS_SERVER_KEY;
 const isProduction = false;
 
 export const charge = async (req, res) => {
     const {orderId, totalPrice, email, phone, name} = req.body;
-    const url = isProduction ? process.env.MIDTRANS_PRODUCTION_URL : process.env.MIDTRANS_SANDBOX_URL;
-    const transaction_details = {
-        transaction_details: {
-            order_id: orderId,
-            gross_amount: totalPrice
-        },
-        customer_details: {
-            first_name: name,
-            email: email,
-            phone: phone,
-        }
-    }
+    const url = isProduction
+        ? process.env.CHARGE_PRODUCTION_URL
+        : process.env.CHARGE_SANDBOX_URL;
     try {
+        const transaction_details = {
+            transaction_details: {
+                order_id: orderId,
+                gross_amount: totalPrice
+            },
+            customer_details: {
+                first_name: name,
+                email: email,
+                phone: phone,
+            }
+        }
+        // call charge API using request body passed by mobile SDK
         const chargeResult = await chargeAPI(url, serverKey, transaction_details);
         res.status(chargeResult.httpCode).json(chargeResult.body);
     } catch (error) {
@@ -94,8 +99,9 @@ async function chargeAPI(apiUrl, serverKey, requestBody) {
             httpCode: response.status
         };
     } catch (error) {
+        console.log(error)
         return {
-            body: {error: 'Failed to charge'},
+            body: {error: error},
             httpCode: error.response ? error.response.status : 500
         };
     }

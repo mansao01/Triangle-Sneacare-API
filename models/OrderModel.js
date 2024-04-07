@@ -1,11 +1,10 @@
 import {DataTypes} from "sequelize";
 import db from "../config/Database.js";
 import UserModel from "./UserModel.js";
-import ProductModel from "./ProductModel.js";
+import ServiceModel from "./ServiceModel.js";
 import CartModel from "./CartModel.js";
 
-// change to selectedProduct
-const SelectedProductModel = db.define("selectedProduct", {
+const OrderModel = db.define("order", {
     id:{
         primaryKey: true,
         type: DataTypes.STRING,
@@ -26,26 +25,26 @@ const SelectedProductModel = db.define("selectedProduct", {
     freezeTableName: true
 })
 
-SelectedProductModel.belongsTo(UserModel)
-SelectedProductModel.belongsTo(ProductModel)
-SelectedProductModel.belongsTo(CartModel)
+OrderModel.belongsTo(UserModel)
+OrderModel.belongsTo(ServiceModel)
+OrderModel.belongsTo(CartModel)
 
-UserModel.hasMany(SelectedProductModel, {
+UserModel.hasMany(OrderModel, {
     foreignKey: "userId",
     onDelete: "cascade",
     onUpdate: "cascade"
 })
-ProductModel.hasMany(SelectedProductModel, {
-    foreignKey: "productId",
+ServiceModel.hasMany(OrderModel, {
+    foreignKey: "serviceId",
     onDelete: "cascade",
     onUpdate: "cascade"
 })
-CartModel.hasMany(SelectedProductModel, {
+CartModel.hasMany(OrderModel, {
     foreignKey: "cartId",
     onDelete: "cascade",
     onUpdate: "cascade"
 })
 
-SelectedProductModel.belongsTo(UserModel)
+OrderModel.belongsTo(UserModel)
 
-export default SelectedProductModel
+export default OrderModel

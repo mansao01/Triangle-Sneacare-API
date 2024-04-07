@@ -1,7 +1,7 @@
 import {DataTypes} from "sequelize";
 import db from "../config/Database.js";
 
-const ItemTypeModel = db.define("itemType", {
+const CategoryModel = db.define("category", {
     itemType: {
         type: DataTypes.STRING, //helmet, shoes, bag, etc
         unique: true,
@@ -10,4 +10,4 @@ const ItemTypeModel = db.define("itemType", {
     freezeTableName: true
 })
 
-export default ItemTypeModel
+export default CategoryModel

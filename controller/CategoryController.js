@@ -1,12 +1,12 @@
 
-import ItemTypeModel from "../models/ItemTypeModel.js";
+import CategoryModel from "../models/CategoryModel.js";
 
-export const addItemType = async (req, res) => {
+export const addCategory = async (req, res) => {
  try {
      const {itemType } = req.body;
 
 
-     const newType = await ItemTypeModel.create({ itemType });
+     const newType = await CategoryModel.create({ itemType });
      res.status(201).json({ msg: "item type added successfully", newType });
 
  }catch (e) {
@@ -19,17 +19,29 @@ export const addItemType = async (req, res) => {
  }
 }
 
-export const deleteItemType = async (req, res) => {
+export const getCategories = async (req, res) => {
+    try {
+        const categories = await CategoryModel.findAll();
+
+        res.status(200).json({categories});
+    } catch (error) {
+        console.error("Error getting item types:", error);
+
+        res.status(500).json({msg: "Internal server error"});
+    }
+};
+
+export const deleteCategory = async (req, res) => {
     try {
         const {id} = req.params;
 
-        const role = await ItemTypeModel.findOne({where: {id}});
+        const role = await CategoryModel.findOne({where: {id}});
 
         if (!role) {
             return res.status(404).json({msg: "Item type not found"});
         }
 
-        await ItemTypeModel.destroy({where: {id}});
+        await CategoryModel.destroy({where: {id}});
 
         res.status(200).json({msg: "item type deleted successfully"});
     } catch (error) {

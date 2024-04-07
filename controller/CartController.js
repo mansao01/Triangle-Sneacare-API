@@ -1,6 +1,6 @@
-import SelectedProductModel from "../models/SelectedProductModel.js";
+import OrderModel from "../models/OrderModel.js";
 import CartModel from "../models/CartModel.js";
-import ProductModel from "../models/ProductModel.js";
+import ServiceModel from "../models/ServiceModel.js";
 
 
 export const addToCart = async (req, res) => {
@@ -16,14 +16,14 @@ export const addToCart = async (req, res) => {
             cart = cart[0];
         }
 
-        await SelectedProductModel.update(
+        await OrderModel.update(
             { cartId: cart.id },
             { where: { id: transactionId } }
         );
 
-        const itemsInCart = await SelectedProductModel.findAll({
+        const itemsInCart = await OrderModel.findAll({
             where: { cartId: cart.id },
-            include: [{ model: ProductModel }]
+            include: [{ model: ServiceModel }]
         });
 
         let totalPrice = 0;
@@ -62,7 +62,7 @@ export const getCart = async (req, res) => {
     try {
         const cart = await CartModel.findOne({
             where: { userId: userId },
-            include: [{ model: SelectedProductModel, include: [{ model: ProductModel }] }]
+            include: [{ model: OrderModel, include: [{ model: ServiceModel }] }]
         });
 
         if (!cart) {

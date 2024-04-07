@@ -1,4 +1,4 @@
-import SelectedProductModel from "../models/SelectedProductModel.js";
+import OrderModel from "../models/OrderModel.js";
 import multer from "multer";
 import ImgUpload from "../modules/imgUpload.js";
 // Multer configuration
@@ -6,13 +6,13 @@ const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 
 
-export const addSelectedProduct = (req, res) => {
+export const addOrder = (req, res) => {
     upload.single('image')(req, res, async (err) => {
         if (err) {
             return res.status(400).json({msg: err.message});
         }
 
-        const { washStatus, productId, userId} = req.body;
+        const { washStatus, serviceId: serviceId, userId} = req.body;
         let imageUrl = '';
 
         // Call ImgUpload function to upload to GCS
@@ -26,15 +26,15 @@ export const addSelectedProduct = (req, res) => {
 
                 try {
                     // Create a new transaction using Sequelize's create method
-                    const newSelectedProduct = await SelectedProductModel.create({
+                    const order = await OrderModel.create({
                         washStatus: washStatus,
                         imageUrl: imageUrl,
-                        productId: productId,
+                        serviceId: serviceId,
                         userId: userId
                     });
 
                     // If transaction is created successfully, send a success response
-                    return res.status(201).json({msg: 'Success add product', transaction: newSelectedProduct});
+                    return res.status(201).json({msg: 'Success add order', order: order});
                 } catch (error) {
                     // If there's an error during creation, handle it and send an error response
                     return res.status(500).json({msg: 'Failed to create transaction', details: error.message});

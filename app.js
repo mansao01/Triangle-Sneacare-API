@@ -4,9 +4,9 @@ import dotEnv from 'dotenv';
 import RoleRoute from "./routes/RoleRoute.js";
 import bodyParser from "body-parser";
 import UserRoute from "./routes/UserRoute.js";
-import ItemTypeRoute from "./routes/ItemTypeRoute.js";
-import ProductRoute from "./routes/ProductRoute.js";
-import TransactionRoute from "./routes/SelectedProductRoute.js";
+import ItemTypeRoute from "./routes/CategoryRoute.js";
+import ProductRoute from "./routes/ServiceRoute.js";
+import TransactionRoute from "./routes/OrderRoute.js";
 import CartRoute from "./routes/CartRoute.js";
 import CheckoutRoute from "./routes/TransactionRoute.js";
 import LocationRoute from "./routes/LocationRoute.js";
@@ -19,7 +19,7 @@ const app = express()
 try {
     await db.authenticate()
     console.log("Database connected")
-    // await db.sync()
+    await db.sync()
 } catch (e) {
     console.log(e)
 }

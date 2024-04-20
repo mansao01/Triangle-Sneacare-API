@@ -83,14 +83,14 @@ export const getServicesByCategory = async (req, res) => {
 
     try {
         const service = await ServiceModel.findAll({
-            where: {itemTypeId: categoryId},
+            where: {categoryId: categoryId},
             include: CategoryModel
         });
 
         res.status(200).json({service: service});
     } catch (e) {
         console.log("Error getting products:", e);
-        res.status(500).json({msg: "Internal server error"});
+        res.status(500).json({msg: e});
     }
 }
 

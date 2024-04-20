@@ -8,7 +8,7 @@ const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 
 export const addService = async (req, res) => {
-    const {productName: serviceName, price, categoryId, serviceDescription} = req.body;
+    const {serviceName, price, categoryId, serviceDescription} = req.body;
 
     try {
         const product = await ServiceModel.create({

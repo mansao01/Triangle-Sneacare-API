@@ -6,6 +6,15 @@ import UserModel from "./UserModel.js";
 
 // change to transaction
 const TransactionModel = db.define("transaction", {
+    id:{
+        primaryKey: true,
+        type: DataTypes.STRING,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        validate:{
+            notEmpty: true
+        }
+    },
     receiveByCustomer: {
         type: DataTypes.BOOLEAN,
         allowNull: false
@@ -23,7 +32,7 @@ const TransactionModel = db.define("transaction", {
         allowNull: false
     },
     deliveryStatus:{
-        type:DataTypes.STRING, //pending, delivering, delivered
+        type:DataTypes.STRING, //pending, picking up, delivering, delivered
         allowNull: false
     },
     transactionDate:{

@@ -4,6 +4,15 @@ import UserModel from "./UserModel.js";
 
 
 const CustomerAddressModel = db.define("customerAddress", {
+    id:{
+        primaryKey: true,
+        type: DataTypes.STRING,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        validate:{
+            notEmpty: true
+        }
+    },
     title: {
         type: DataTypes.STRING
     },

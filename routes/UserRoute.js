@@ -1,7 +1,6 @@
 import express from "express";
 
 import {
-    getDrivers,
     getProfile,
     loginUser,
     logoutUser,
@@ -30,7 +29,6 @@ router.post("/v1/addTransactionCount", authMiddleware, addSuccessTransactionCoun
 
 router.get("/v1/verify-email/:id", verifyEmail)
 
-router.get("/v1/drivers", getDrivers)
 
 router.post("/v1/sendResetPassword", sendResetPasswordRequest)
 router.post("/v1/verifyOtp", verifyOTP)

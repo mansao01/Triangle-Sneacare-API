@@ -80,7 +80,7 @@ export const register = async (req, res) => {
         }
 
         transporter.sendMail(message).then((info) => {
-            return res.status(201).json({
+            return res.status(200).json({
                 msg: "Registration successful",
                 user: userResponse,
                 info: info.messageId,
@@ -414,20 +414,6 @@ export const getUserDetailById = async (req, res) => {
     }
 }
 
-export const getDrivers = async (req, res) => {
-    try {
-        const drivers = await UserModel.findAll({
-            where: {roleId: 3},
-            attributes: ['id', 'name', 'email', 'address', 'phone', 'pictureUrl'],
-            include: [{model: RoleModel}]
-        });
-
-        res.status(200).json({msg: "Success", drivers})
-    } catch (error) {
-        console.error("Error fetching drivers:", error);
-        res.status(500).json({msg: "Internal server error"});
-    }
-}
 
 
 export const addSuccessTransactionCount = async (req, res) => {

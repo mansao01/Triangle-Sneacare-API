@@ -106,3 +106,22 @@ export const getServices = async (req, res) => {
         res.status(500).json({msg: "Internal server error"});
     }
 }
+
+export const updateService = async (req, res) => {
+
+    const {id, serviceName, price, serviceDescription} = req.body;
+
+    try {
+        await ServiceModel.update({
+            serviceName: serviceName,
+            price: price,
+            serviceDescription: serviceDescription
+        }, {
+            where: {id}
+        })
+
+        return res.status(200).json({msg: "Service updated successfully"});
+    } catch (e) {
+        return res.status(500).json({msg: e});
+    }
+}

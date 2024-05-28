@@ -4,12 +4,12 @@ import ServiceModel from "../models/ServiceModel.js";
 
 
 export const addToCart = async (req, res) => {
-    const { transactionId, userId } = req.body;
+    const {orderId, userId} = req.body;
 
     try {
         let [cart, created] = await CartModel.findOrCreate({
-            where: { userId },
-            defaults: { status: 'active' }
+            where: {userId},
+            defaults: {status: 'active'}
         });
 
         if (created) {
@@ -17,13 +17,13 @@ export const addToCart = async (req, res) => {
         }
 
         await OrderModel.update(
-            { cartId: cart.id },
-            { where: { id: transactionId } }
+            {cartId: cart.id},
+            {where: {id: orderId}}
         );
 
         const itemsInCart = await OrderModel.findAll({
-            where: { cartId: cart.id },
-            include: [{ model: ServiceModel }]
+            where: {cartId: cart.id},
+            include: [{model: ServiceModel}]
         });
 
         let totalPrice = 0;
@@ -41,7 +41,7 @@ export const addToCart = async (req, res) => {
         });
 
         // Update the cart's total price
-        await CartModel.update({ totalPrice }, { where: { id: cart.id } });
+        await CartModel.update({totalPrice}, {where: {id: cart.id}});
 
         res.status(200).json({
             msg: 'Item added to cart successfully',
@@ -51,22 +51,25 @@ export const addToCart = async (req, res) => {
         });
     } catch (error) {
         console.error('Error adding item to cart:', error);
-        res.status(500).json({ msg: 'Failed to add item to cart' });
+        res.status(500).json({msg: 'Failed to add item to cart'});
     }
 };
 
+export const finishCartStatus = async (req, res) => {
+    const {cartId} = req.query
+}
 
 export const getCart = async (req, res) => {
-    const { userId } = req.params;
+    const {userId} = req.params;
 
     try {
         const cart = await CartModel.findOne({
-            where: { userId: userId },
-            include: [{ model: OrderModel, include: [{ model: ServiceModel }] }]
+            where: {userId: userId},
+            include: [{model: OrderModel, include: [{model: ServiceModel}]}]
         });
 
         if (!cart) {
-            return res.status(404).json({ msg: 'Cart not found' });
+            return res.status(404).json({msg: 'Cart not found'});
         }
 
         const itemsInCart = cart.transactions.map(item => ({
@@ -86,6 +89,6 @@ export const getCart = async (req, res) => {
         });
     } catch (error) {
         console.error('Error retrieving cart:', error);
-        res.status(500).json({ msg: 'Failed to retrieve cart' });
+        res.status(500).json({msg: 'Failed to retrieve cart'});
     }
 }

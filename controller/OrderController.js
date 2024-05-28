@@ -12,7 +12,7 @@ export const addOrder = (req, res) => {
             return res.status(400).json({msg: err.message});
         }
 
-        const { washStatus, serviceId: serviceId, userId} = req.body;
+        const { washStatus, serviceId, userId} = req.body;
         let imageUrl = '';
 
         // Call ImgUpload function to upload to GCS

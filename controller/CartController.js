@@ -3,58 +3,6 @@ import CartModel from "../models/CartModel.js";
 import ServiceModel from "../models/ServiceModel.js";
 
 
-// export const addToCart = async (req, res) => {
-//     const {orderId, userId} = req.body;
-//
-//     try {
-//         let [cart, created] = await CartModel.findOrCreate({
-//             where: {userId, status: 'active'},
-//             defaults: {status: 'active'}
-//         });
-//
-//         if (created) {
-//             cart = cart[0];
-//         }
-//
-//         await OrderModel.update(
-//             {cartId: cart.id},
-//             {where: {id: orderId}}
-//         );
-//
-//         const itemsInCart = await OrderModel.findAll({
-//             where: {cartId: cart.id},
-//             include: [{model: ServiceModel}]
-//         });
-//
-//         let totalPrice = 0;
-//
-//         const itemsWithPrice = itemsInCart.map(item => {
-//             const itemPrice = item.product ? item.product.price : 0;
-//             totalPrice += itemPrice; // Accumulate item prices for total price calculation
-//
-//             return {
-//                 id: item.id,
-//                 washStatus: item.washStatus,
-//                 imageUrl: item.imageUrl,
-//                 productDetail: item.product,
-//             };
-//         });
-//
-//         // Update the cart's total price
-//         await CartModel.update({totalPrice}, {where: {id: cart.id}});
-//
-//         res.status(200).json({
-//             msg: 'Item added to cart successfully',
-//             cartId: cart.id,
-//             items: itemsWithPrice,
-//             totalPrice: totalPrice // Include total price in the response
-//         });
-//     } catch (error) {
-//         console.error('Error adding item to cart:', error);
-//         res.status(500).json({msg: error});
-//     }
-// };
-
 export const addToCart = async (req, res) => {
     const { orderId, userId } = req.body;
 
@@ -80,14 +28,14 @@ export const addToCart = async (req, res) => {
         let totalPrice = 0;
 
         const itemsWithPrice = itemsInCart.map(item => {
-            const itemPrice = item.product ? item.product.price : 0;
+            const itemPrice = item.service ? item.service.price : 0;
             totalPrice += itemPrice; // Accumulate item prices for total price calculation
 
             return {
                 id: item.id,
                 washStatus: item.washStatus,
                 imageUrl: item.imageUrl,
-                productDetail: item.product,
+                productDetail: item.service,
             };
         });
 
@@ -127,13 +75,11 @@ export const getCart = async (req, res) => {
             return res.status(404).json({msg: 'Cart not found'});
         }
 
-        const itemsInCart = cart.transactions.map(item => ({
+        const itemsInCart = (cart.orders || []).map(item => ({
             id: item.id,
-            transactionDate: item.transactionDate,
-            confirmed: item.confirmed,
             washStatus: item.washStatus,
             imageUrl: item.imageUrl,
-            productDetail: item.product
+            service : item.service
         }));
 
         res.status(200).json({

@@ -45,3 +45,22 @@ export const addOrder = (req, res) => {
         });
     });
 };
+
+export const deleteOrder = async (req, res) => {
+    const {orderId} = req.params;
+
+    try {
+        // Find the transaction by ID
+        const order = await OrderModel.findByPk(orderId);
+
+        // If transaction is found, delete it
+        if (order) {
+            await order.destroy();
+            return res.status(200).json({msg: 'Order deleted successfully', order});
+        } else {
+            return res.status(404).json({msg: 'Order not found'});
+        }
+    } catch (error) {
+        return res.status(500).json({msg: 'Failed to delete order', details: error.message});
+    }
+}

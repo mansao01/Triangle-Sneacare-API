@@ -1,6 +1,8 @@
 import OrderModel from "../models/OrderModel.js";
 import multer from "multer";
 import ImgUpload from "../modules/imgUpload.js";
+import CartModel from "../models/CartModel.js";
+import ServiceModel from "../models/ServiceModel.js";
 // Multer configuration
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
@@ -47,20 +49,43 @@ export const addOrder = (req, res) => {
 };
 
 export const deleteOrder = async (req, res) => {
-    const {orderId} = req.params;
+    const { orderId } = req.params;
 
     try {
-        // Find the transaction by ID
+        // Find the order by ID
         const order = await OrderModel.findByPk(orderId);
 
-        // If transaction is found, delete it
+        // If order is found, delete it
         if (order) {
+            const cartId = order.cartId; // Get the cart ID before deleting the order
             await order.destroy();
-            return res.status(200).json({msg: 'Order deleted successfully', order});
+
+            // Retrieve all remaining items in the cart
+            const itemsInCart = await OrderModel.findAll({
+                where: { cartId: cartId },
+                include: [{ model: ServiceModel }]
+            });
+
+            // Recalculate the total price of the cart
+            let totalPrice = 0;
+            itemsInCart.forEach(item => {
+                const itemPrice = item.service ? item.service.price : 0;
+                totalPrice += itemPrice;
+            });
+
+            // Update the cart's total price
+            await CartModel.update({ totalPrice }, { where: { id: cartId } });
+
+            return res.status(200).json({
+                msg: 'Order deleted successfully',
+                order,
+                totalPrice // Include updated total price in the response
+            });
         } else {
-            return res.status(404).json({msg: 'Order not found'});
+            return res.status(404).json({ msg: 'Order not found' });
         }
     } catch (error) {
-        return res.status(500).json({msg: 'Failed to delete order', details: error.message});
+        console.error('Error deleting order:', error);
+        return res.status(500).json({ msg: 'Failed to delete order', details: error.message });
     }
-}
+};

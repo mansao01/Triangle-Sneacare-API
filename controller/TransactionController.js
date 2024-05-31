@@ -1,13 +1,22 @@
 import TransactionModel from "../models/TransactionModel.js";
 import CartModel from "../models/CartModel.js";
+import moment from "moment-timezone";
 
-export const addTransaction = async (req, res) => {
-    const {cartId, receiveByCustomer, deliveryMethod} = req.body;
-    const transactionDate = new Date();
+export const createTransaction = async (req, res) => {
+    const {cartId, deliveryMethod, paymentMethod, customerAddressId, userId} = req.body;
+    const transactionDate = moment().tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
+    const paymentStatus = "pending";
+    const receiveByCustomer = false;
+    const deliveryStatus = "pending";
 
     try {
         const transaction = await TransactionModel.create({
             cartId: cartId,
+            userId: userId,
+            paymentMethod: paymentMethod,
+            paymentStatus: paymentStatus,
+            deliveryStatus: deliveryStatus,
+            customerAddressId: customerAddressId,
             receiveByCustomer: receiveByCustomer,
             deliveryMethod: deliveryMethod,
             transactionDate: transactionDate
@@ -21,8 +30,8 @@ export const addTransaction = async (req, res) => {
         const transactionResponse = {
             id: transaction.id,
             cart: cart,
-            receivedByCustomer: transaction.receiveByCustomer,
-            deliveryMethod: transaction.deliveryMethod
+            deliveryMethod: transaction.deliveryMethod,
+            paymentMethod: transaction.paymentMethod,
         }
 
         res.status(200).json({msg: "transaction added successfully", transaction: transactionResponse});

@@ -1,9 +1,10 @@
 import TransactionModel from "../models/TransactionModel.js";
 import CartModel from "../models/CartModel.js";
 import moment from "moment-timezone";
+import {nanoid} from "nanoid";
 
 export const createTransaction = async (req, res) => {
-    const {cartId, deliveryMethod, paymentMethod, customerAddressId, userId} = req.body;
+    const {cartId, deliveryMethod, paymentMethod, customerAddressId, userId, totalPurchasePrice} = req.body;
     const transactionDate = moment().tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
     const paymentStatus = "pending";
     const receiveByCustomer = false;
@@ -19,7 +20,8 @@ export const createTransaction = async (req, res) => {
             customerAddressId: customerAddressId,
             receiveByCustomer: receiveByCustomer,
             deliveryMethod: deliveryMethod,
-            transactionDate: transactionDate
+            transactionDate: transactionDate,
+            totalPurchasePrice: totalPurchasePrice
         });
 
         const cart = await CartModel.findByPk(cartId);
@@ -32,6 +34,7 @@ export const createTransaction = async (req, res) => {
             cart: cart,
             deliveryMethod: transaction.deliveryMethod,
             paymentMethod: transaction.paymentMethod,
+            totalPurchasePrice: transaction.totalPurchasePrice,
         }
 
         res.status(200).json({msg: "transaction added successfully", transaction: transactionResponse});

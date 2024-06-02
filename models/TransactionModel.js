@@ -35,6 +35,10 @@ const TransactionModel = db.define("transaction", {
         type:DataTypes.STRING, //pending, picking up, delivering, delivered
         allowNull: false
     },
+    totalPurchasePrice:{
+        type:DataTypes.INTEGER,
+        allowNull: false
+    },
     transactionDate:{
         type:DataTypes.DATE,
         allowNull: false

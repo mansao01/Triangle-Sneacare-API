@@ -1,6 +1,8 @@
 import axios from "axios";
 import base64 from "base-64";
 import dotEnv from 'dotenv';
+import TransactionModel from "../models/TransactionModel.js";
+
 dotEnv.config()
 
 const serverKey = process.env.MIDTRANS_SERVER_KEY;
@@ -55,6 +57,18 @@ export const getTransactionPaymentStatus = async (req, res) => {
     } catch (e) {
         res.status(500).json({error: 'Internal Server Error'});
     }
+}
+
+export const updatePaymentStatus = async (req, res) => {
+    const {transactionId, status} = req.params
+
+    try {
+        const transaction = await TransactionModel.update({paymentStatus: status}, {where: {id: transactionId}})
+        res.status(200).json({msg: "Payment status updated successfully", transaction})
+    } catch (e) {
+        res.status(500).json({error: e});
+    }
+
 }
 
 export const cancelTransaction = async (req, res) => {

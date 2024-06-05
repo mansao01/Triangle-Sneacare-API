@@ -60,7 +60,7 @@ export const getTransactionPaymentStatus = async (req, res) => {
 }
 
 export const updatePaymentStatus = async (req, res) => {
-    const {transactionId, status} = req.params
+    const {transactionId, status} = req.query
 
     try {
         const transaction = await TransactionModel.update({paymentStatus: status}, {where: {id: transactionId}})

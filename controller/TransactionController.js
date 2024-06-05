@@ -60,6 +60,7 @@ export const getTransactionById = async (req, res) => {
                 cart: transaction.cartId,
                 deliveryMethod: transaction.deliveryMethod,
                 paymentMethod: transaction.paymentMethod,
+                paymentStatus: transaction.paymentStatus,
                 totalPurchasePrice: transaction.totalPurchasePrice,
                 items: itemInCart
             }

@@ -6,9 +6,8 @@ import OrderModel from "../models/OrderModel.js";
 import ServiceModel from "../models/ServiceModel.js";
 
 export const createTransaction = async (req, res) => {
-    const {cartId, deliveryMethod, paymentMethod, customerAddressId, userId, totalPurchasePrice} = req.body;
+    const {cartId, deliveryMethod, paymentMethod, customerAddressId, userId, totalPurchasePrice, paymentStatus} = req.body;
     const transactionDate = moment().tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
-    const paymentStatus = "pending";
     const receiveByCustomer = false;
     const deliveryStatus = "pending";
 

@@ -51,9 +51,28 @@ export const getTransactionById = async (req, res) => {
         const transactions = await TransactionModel.findAll({
             where: { userId: id }
         });
-        // Assuming you want to send back the detailed transactions including cart and order info
-        const itemInCart = await OrderModel.findAll(transactions.cartId)
-        const transactionResponse = transactions.map(transaction => {
+
+        // Loop through transactions to get cart items
+        const transactionResponse = await Promise.all(transactions.map(async (transaction) => {
+            const itemsInCart = await OrderModel.findAll({
+                where: { cartId: transaction.cartId },
+                include: [
+                    {
+                        model: ServiceModel,
+                        attributes: ['serviceName', 'price']
+                    }
+                ]
+            });
+
+            // Format items with service name
+            const formattedItems = itemsInCart.map(item => ({
+                id: item.id,
+                washStatus: item.washStatus,
+                imageUrl: item.imageUrl,
+                serviceName: item.service.serviceName, // Access the service name
+                price: item.service.price
+            }));
+
             return {
                 id: transaction.id,
                 cart: transaction.cartId,
@@ -61,11 +80,14 @@ export const getTransactionById = async (req, res) => {
                 paymentMethod: transaction.paymentMethod,
                 paymentStatus: transaction.paymentStatus,
                 totalPurchasePrice: transaction.totalPurchasePrice,
-                items: itemInCart
-            }
-        });
+                items: formattedItems
+            };
+        }));
+
         res.status(200).json({ msg: "Success", transactions: transactionResponse });
     } catch (e) {
         res.status(500).json({ msg: e.message }); // It's better to send back the error message only
     }
 };
+
+

@@ -4,6 +4,7 @@ import moment from "moment-timezone";
 import {nanoid} from "nanoid";
 import OrderModel from "../models/OrderModel.js";
 import ServiceModel from "../models/ServiceModel.js";
+import CustomerAddressModel from "../models/CustomerAddressModel.js";
 
 export const createTransaction = async (req, res) => {
     const {cartId, deliveryMethod, paymentMethod, customerAddressId, userId, totalPurchasePrice, paymentStatus} = req.body;
@@ -141,6 +142,7 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
                 paymentMethod: transaction.paymentMethod,
+                customerAddressId: transaction.customerAddressId,
                 paymentStatus: transaction.paymentStatus,
                 totalPurchasePrice: transaction.totalPurchasePrice,
                 items: formattedItems
@@ -148,8 +150,8 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
         }));
 
         res.status(200).json({ msg: "Success", transactions: transactionResponse });
-    }catch (e){
-        res.status(500).json({msg: e.message});
+    } catch (e) {
+        res.status(500).json({ msg: e.message });
     }
 }
 

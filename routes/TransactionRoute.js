@@ -11,6 +11,6 @@ const router = express.Router();
 router.post("/v1/createTransaction", createTransaction)
 router.get("/v1/transactions/:id", getTransactionById)
 router.patch("/v1/transaction", updateDeliveryStatus)
-router.get("/v1/transactions/status", getTransactionsByDeliveryStatus)
+router.get("/v1/transactionsByDeliveryStatus", getTransactionsByDeliveryStatus)
 
 export default router;

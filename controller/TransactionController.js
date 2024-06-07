@@ -45,6 +45,21 @@ export const createTransaction = async (req, res) => {
     }
 }
 
+export const updateDeliveryStatus = async (req, res) => {
+    const {id, status} = req.query;
+    try {
+        const transaction = await TransactionModel.findByPk(id);
+        if (!transaction) {
+            return res.status(404).json({msg: "Transaction not found"});
+        }
+        await transaction.update({deliveryStatus: status});
+        res.status(200).json({msg: "Delivery status updated successfully", transaction});
+    } catch (e) {
+        console.error(e);
+        res.status(400).json({msg: "Failed to update delivery status", e});
+    }
+}
+
 export const getTransactionById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -90,5 +105,52 @@ export const getTransactionById = async (req, res) => {
         res.status(500).json({ msg: e.message }); // It's better to send back the error message only
     }
 };
+
+export const getTransactionsByDeliveryStatus = async (req, res) => {
+    const { status } = req.query;
+
+    try {
+        const transactions = await TransactionModel.findAll({
+            where: { deliveryStatus: status }
+        });
+
+        // Loop through transactions to get cart items
+        const transactionResponse = await Promise.all(transactions.map(async (transaction) => {
+            const itemsInCart = await OrderModel.findAll({
+                where: { cartId: transaction.cartId },
+                include: [
+                    {
+                        model: ServiceModel,
+                        attributes: ['serviceName', 'price']
+                    }
+                ]
+            });
+
+            // Format items with service name
+            const formattedItems = itemsInCart.map(item => ({
+                id: item.id,
+                washStatus: item.washStatus,
+                imageUrl: item.imageUrl,
+                serviceName: item.service.serviceName, // Access the service name
+                price: item.service.price
+            }));
+
+            return {
+                id: transaction.id,
+                cart: transaction.cartId,
+                deliveryMethod: transaction.deliveryMethod,
+                deliveryStatus: transaction.deliveryStatus,
+                paymentMethod: transaction.paymentMethod,
+                paymentStatus: transaction.paymentStatus,
+                totalPurchasePrice: transaction.totalPurchasePrice,
+                items: formattedItems
+            };
+        }));
+
+        res.status(200).json({ msg: "Success", transactions: transactionResponse });
+    }catch (e){
+        res.status(500).json({msg: e.message});
+    }
+}
 
 

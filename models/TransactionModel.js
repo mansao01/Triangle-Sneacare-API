@@ -4,7 +4,6 @@ import CartModel from "./CartModel.js";
 import CustomerAddressModel from "./CustomerAddressModel.js";
 import UserModel from "./UserModel.js";
 
-// change to transaction
 const TransactionModel = db.define("transaction", {
     id:{
         primaryKey: true,
@@ -62,5 +61,6 @@ CartModel.hasMany(TransactionModel, {
 })
 
 TransactionModel.belongsTo(UserModel)
+TransactionModel.belongsTo(CustomerAddressModel)
 
 export default TransactionModel

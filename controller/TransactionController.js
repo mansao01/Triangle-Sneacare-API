@@ -112,7 +112,13 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
 
     try {
         const transactions = await TransactionModel.findAll({
-            where: { deliveryStatus: status }
+            where: { deliveryStatus: status },
+            include: [
+                {
+                    model: CustomerAddressModel,
+                    attributes: ['title', 'receiverName', 'phone', 'fullAddress', 'latitude', 'longitude', 'notes']
+                }
+            ]
         });
 
         // Loop through transactions to get cart items
@@ -136,13 +142,25 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
                 price: item.service.price
             }));
 
+            // Add customer address details
+            const customerAddress = transaction.customerAddress;
+
             return {
                 id: transaction.id,
                 cart: transaction.cartId,
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
                 paymentMethod: transaction.paymentMethod,
-                customerAddressId: transaction.customerAddressId,
+                customerAddress: {
+                    id: customerAddress.id,
+                    title: customerAddress.title,
+                    receiverName: customerAddress.receiverName,
+                    phone: customerAddress.phone,
+                    fullAddress: customerAddress.fullAddress,
+                    latitude: customerAddress.latitude,
+                    longitude: customerAddress.longitude,
+                    notes: customerAddress.notes
+                },
                 paymentStatus: transaction.paymentStatus,
                 totalPurchasePrice: transaction.totalPurchasePrice,
                 items: formattedItems
@@ -154,5 +172,4 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
         res.status(500).json({ msg: e.message });
     }
 }
-
 

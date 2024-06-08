@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    createTransaction,
+    createTransaction, getTransactionsByMonth,
     getTransactionById,
     getTransactionsByDeliveryStatus,
     updateDeliveryStatus
@@ -12,5 +12,6 @@ router.post("/v1/createTransaction", createTransaction)
 router.get("/v1/transactions/:id", getTransactionById)
 router.patch("/v1/transaction", updateDeliveryStatus)
 router.get("/v1/transactionsByDeliveryStatus", getTransactionsByDeliveryStatus)
+router.get("/v1/getTransactionsByMonth", getTransactionsByMonth)
 
 export default router;

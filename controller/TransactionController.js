@@ -6,6 +6,7 @@ import OrderModel from "../models/OrderModel.js";
 import ServiceModel from "../models/ServiceModel.js";
 import CustomerAddressModel from "../models/CustomerAddressModel.js";
 import UserModel from "../models/UserModel.js";
+import {Op} from "sequelize";
 
 export const createTransaction = async (req, res) => {
     const {
@@ -52,6 +53,31 @@ export const createTransaction = async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(400).json({msg: "Failed to add checkout", e});
+    }
+}
+
+export const getTransactionsByMonth = async (req, res) => {
+    try {
+        const { month, year } = req.query;
+
+        if (!month || !year) {
+            return res.status(400).json({ msg: "Month and year are required" });
+        }
+
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+        const transactions = await TransactionModel.findAll({
+            where: {
+                transactionDate: {
+                    [Op.between]: [startDate, endDate]
+                }
+            }
+        });
+
+        res.status(200).json({ msg: "Success", transactions });
+    } catch (e) {
+        res.status(500).json({ msg: e.message });
     }
 }
 

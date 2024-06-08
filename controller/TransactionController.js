@@ -58,10 +58,10 @@ export const createTransaction = async (req, res) => {
 
 export const getTransactionsByMonth = async (req, res) => {
     try {
-        const { month, year } = req.query;
+        const {month, year} = req.query;
 
         if (!month || !year) {
-            return res.status(400).json({ msg: "Month and year are required" });
+            return res.status(400).json({msg: "Month and year are required"});
         }
 
         const startDate = new Date(year, month - 1, 1);
@@ -72,14 +72,74 @@ export const getTransactionsByMonth = async (req, res) => {
                 transactionDate: {
                     [Op.between]: [startDate, endDate]
                 }
-            }
+            },
+            include: [
+                {
+                    model: CustomerAddressModel,
+                    attributes: ['title', 'receiverName', 'phone', 'fullAddress', 'latitude', 'longitude', 'notes']
+                },
+                {
+                    model: UserModel
+                }
+            ]
         });
 
-        res.status(200).json({ msg: "Success", transactions });
+
+        // Loop through transactions to get cart items
+        const transactionResponse = await Promise.all(transactions.map(async (transaction) => {
+            const itemsInCart = await OrderModel.findAll({
+                where: {cartId: transaction.cartId},
+                include: [
+                    {
+                        model: ServiceModel,
+                        attributes: ['serviceName', 'price']
+                    }
+                ]
+            });
+
+            // Format items with service name
+            const formattedItems = itemsInCart.map(item => ({
+                id: item.id,
+                washStatus: item.washStatus,
+                imageUrl: item.imageUrl,
+                serviceName: item.service.serviceName, // Access the service name
+                price: item.service.price
+            }));
+
+            // Add customer address details
+            const customerAddress = transaction.customerAddress;
+
+            return {
+                id: transaction.id,
+                cart: transaction.cartId,
+                user: transaction.user.name,
+                deliveryMethod: transaction.deliveryMethod,
+                deliveryStatus: transaction.deliveryStatus,
+                paymentMethod: transaction.paymentMethod,
+                customerAddress: {
+                    id: customerAddress.id,
+                    title: customerAddress.title,
+                    receiverName: customerAddress.receiverName,
+                    phone: customerAddress.phone,
+                    fullAddress: customerAddress.fullAddress,
+                    latitude: customerAddress.latitude,
+                    longitude: customerAddress.longitude,
+                    notes: customerAddress.notes
+                },
+                paymentStatus: transaction.paymentStatus,
+                totalPurchasePrice: transaction.totalPurchasePrice,
+                items: formattedItems
+            };
+        }));
+
+        res.status(200).json({msg: "Success", transactions: transactionResponse});
     } catch (e) {
-        res.status(500).json({ msg: e.message });
+        res.status(500).json({msg: e.message});
     }
 }
+
+
+
 
 export const updateDeliveryStatus = async (req, res) => {
     const {id, status} = req.query;
@@ -186,7 +246,7 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
             return {
                 id: transaction.id,
                 cart: transaction.cartId,
-                user:transaction.user.name,
+                user: transaction.user.name,
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
                 paymentMethod: transaction.paymentMethod,

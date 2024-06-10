@@ -14,7 +14,7 @@ export const addOrder = (req, res) => {
             return res.status(400).json({msg: err.message});
         }
 
-        const { washStatus, serviceId, userId} = req.body;
+        const {washStatus, serviceId, userId} = req.body;
         let imageUrl = '';
 
         // Call ImgUpload function to upload to GCS
@@ -48,8 +48,19 @@ export const addOrder = (req, res) => {
     });
 };
 
+export const updateWashStatus = async (req, res) => {
+    const {washStatus, orderId} = req.query;
+    try {
+        const order = await OrderModel.update({washStatus: washStatus}, {where: {id: orderId}});
+        return res.status(200).json({msg: "Wash status updated successfully", order});
+    } catch (e) {
+        return res.status(500).json({error: e});
+    }
+
+}
+
 export const deleteOrder = async (req, res) => {
-    const { orderId } = req.params;
+    const {orderId} = req.params;
 
     try {
         // Find the order by ID
@@ -62,8 +73,8 @@ export const deleteOrder = async (req, res) => {
 
             // Retrieve all remaining items in the cart
             const itemsInCart = await OrderModel.findAll({
-                where: { cartId: cartId },
-                include: [{ model: ServiceModel }]
+                where: {cartId: cartId},
+                include: [{model: ServiceModel}]
             });
 
             // Recalculate the total price of the cart
@@ -74,7 +85,7 @@ export const deleteOrder = async (req, res) => {
             });
 
             // Update the cart's total price
-            await CartModel.update({ totalPrice }, { where: { id: cartId } });
+            await CartModel.update({totalPrice}, {where: {id: cartId}});
 
             return res.status(200).json({
                 msg: 'Order deleted successfully',
@@ -82,10 +93,10 @@ export const deleteOrder = async (req, res) => {
                 totalPrice // Include updated total price in the response
             });
         } else {
-            return res.status(404).json({ msg: 'Order not found' });
+            return res.status(404).json({msg: 'Order not found'});
         }
     } catch (error) {
         console.error('Error deleting order:', error);
-        return res.status(500).json({ msg: 'Failed to delete order', details: error.message });
+        return res.status(500).json({msg: 'Failed to delete order', details: error.message});
     }
 };

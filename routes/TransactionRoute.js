@@ -3,7 +3,7 @@ import {
     createTransaction, getTransactionsByMonth,
     getTransactionById,
     getTransactionsByDeliveryStatus,
-    updateDeliveryStatus
+    updateDeliveryStatus, getTransactionsByMonthAndPaymentStatus
 } from "../controller/TransactionController.js";
 
 const router = express.Router();
@@ -13,5 +13,6 @@ router.get("/v1/transactions/:id", getTransactionById)
 router.patch("/v1/transaction", updateDeliveryStatus)
 router.get("/v1/transactionsByDeliveryStatus", getTransactionsByDeliveryStatus)
 router.get("/v1/getTransactionsByMonth", getTransactionsByMonth)
+router.get("/v1/getTransactionsByMonthAndPaymentStatus", getTransactionsByMonthAndPaymentStatus)
 
 export default router;

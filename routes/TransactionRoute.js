@@ -3,12 +3,13 @@ import {
     createTransaction, getTransactionsByMonth,
     getTransactionById,
     getTransactionsByDeliveryStatus,
-    updateDeliveryStatus, getTransactionsByMonthAndPaymentStatus, getAllTransactions
+    updateDeliveryStatus, getTransactionsByMonthAndPaymentStatus, getAllTransactions, sendFinishCleaningEmailToCustomer
 } from "../controller/TransactionController.js";
 
 const router = express.Router();
 
 router.post("/v1/createTransaction", createTransaction)
+router.post("/v1/sendFinishCleaningEmailToCustomer", sendFinishCleaningEmailToCustomer)
 router.get("/v1/transactions/:id", getTransactionById)
 router.patch("/v1/transaction", updateDeliveryStatus)
 router.get("/v1/transactionsByDeliveryStatus", getTransactionsByDeliveryStatus)

@@ -7,6 +7,7 @@ import ServiceModel from "../models/ServiceModel.js";
 import CustomerAddressModel from "../models/CustomerAddressModel.js";
 import UserModel from "../models/UserModel.js";
 import {Op} from "sequelize";
+import nodemailer from "nodemailer";
 
 export const createTransaction = async (req, res) => {
     const {
@@ -422,3 +423,46 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
     }
 }
 
+
+export const sendFinishCleaningEmailToCustomer = async (req, res) => {
+    const { email, name } = req.body;
+    try {
+        let config = {
+            host: "smtp.gmail.com",
+            service: "gmail",
+            auth: {
+                user: process.env.GMAIL_APP_USER,
+                pass: process.env.GMAIL_APP_PASSWORD
+            }
+        };
+
+        let transporter = nodemailer.createTransport(config);
+
+        let message = {
+            from: process.env.GMAIL_APP_USER,
+            to: email,
+            subject: "Your Order is Ready for Pickup",
+            html: `
+                <p>Dear ${name},</p>
+                <p>We are pleased to inform you that your order has been completed. Your items are now ready for pickup at your convenience.</p>
+                <p>Thank you for choosing our services. We look forward to serving you again in the future.</p>
+                <p>Best regards,</p>
+                <p>Triagnle Sneacare Team</p>
+            `
+        };
+
+        transporter.sendMail(message).then((info) => {
+            return res.status(200).json({
+                msg: "Email sent successfully",
+                info: info.messageId,
+                preview: nodemailer.getTestMessageUrl(info)
+            });
+        }).catch((err) => {
+            console.error(err); // Log the error for debugging purposes
+            return res.status(500).json({ msg: err.message }); // Respond with the error message
+        });
+    } catch (e) {
+        console.error(e); // Log the error for debugging purposes
+        return res.status(500).json({ msg: e.message }); // Respond with the error message
+    }
+};

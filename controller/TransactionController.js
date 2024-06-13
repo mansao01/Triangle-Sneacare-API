@@ -398,6 +398,7 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
                 id: transaction.id,
                 cart: transaction.cartId,
                 user: transaction.user.name,
+                email: transaction.user.email,
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
                 paymentMethod: transaction.paymentMethod,

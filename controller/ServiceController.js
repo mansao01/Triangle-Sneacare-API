@@ -33,7 +33,7 @@ export const addService = async (req, res) => {
         res.status(200).json({msg: "service added successfully", product: serviceResponse});
     } catch (error) {
         console.error(error);
-        res.status(400).json({msg: "Failed to add product", error});
+        res.status(400).json({msg: "Failed to add service", error});
     }
 }
 export const addImageProduct = (req, res) => {

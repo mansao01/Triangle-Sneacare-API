@@ -7,12 +7,12 @@ export const addCategory = async (req, res) => {
 
 
      const newType = await CategoryModel.create({ itemType });
-     res.status(201).json({ msg: "item type added successfully", newType });
+     res.status(201).json({ msg: "Category added successfully", newType });
 
  }catch (e) {
      if (e.name === 'SequelizeUniqueConstraintError') {
          // Duplicate key error (e.g., email already exists)
-         return res.status(400).json({msg: "Email already exists"});
+         return res.status(400).json({msg: "Category already exists"});
      }
      res.status(400).json({ msg: e.message || "An error occurred while adding the item type" });
 

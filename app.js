@@ -23,7 +23,7 @@ try {
 } catch (e) {
     console.log(e)
 }
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(RoleRoute)
 app.use(UserRoute)
@@ -37,12 +37,14 @@ app.use(CustomerAddressRoute)
 app.use(PaymentRoute)
 
 app.get("/", (req, res) => {
-    res.status(201).json({msg: "welcome to triangle sneacare api"})
+    res.status(201).json({ msg: "welcome to triangle sneacare api" })
 })
 app.get("/v1/test", (req, res) => {
-    res.status(201).json({msg: "welcome to triangle sneacare api"})
+    res.status(201).json({ msg: "welcome to triangle sneacare api" })
 })
-
+app.get("v2/test", (req, res) => {
+    res.status(200).json({ msg: "welcome to triangle sneacare api 2.0" })
+})
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {

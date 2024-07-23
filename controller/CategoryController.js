@@ -43,9 +43,9 @@ export const deleteCategory = async (req, res) => {
 
         await CategoryModel.destroy({where: {id}});
 
-        res.status(200).json({msg: "item type deleted successfully"});
+        res.status(200).json({msg: "category deleted successfully"});
     } catch (error) {
-        console.error("Error deleting item type:", error);
+        console.error("Error deleting category:", error);
 
         res.status(500).json({msg: "Internal server error"});
     }

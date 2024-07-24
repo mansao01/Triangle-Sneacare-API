@@ -74,6 +74,7 @@ export const getTransactionsByMonth = async (req, res) => {
                     [Op.between]: [startDate, endDate]
                 }
             },
+            order: [['transactionDate', 'ASC']],
             include: [
                 {
                     model: CustomerAddressModel,
@@ -109,11 +110,14 @@ export const getTransactionsByMonth = async (req, res) => {
 
             // Add customer address details
             const customerAddress = transaction.customerAddress;
+            const formattedDate = transaction.transactionDate.toLocaleDateString();
+
 
             return {
                 id: transaction.id,
                 cart: transaction.cartId,
                 user: transaction.user.name,
+                date: formattedDate,
                 email: transaction.user.email,
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
@@ -142,6 +146,7 @@ export const getTransactionsByMonth = async (req, res) => {
 export const getAllTransactions = async (req, res) => {
     try {
         const transactions = await TransactionModel.findAll({
+            order: [['transactionDate', 'ASC']],
             include: [
                 {
                     model: CustomerAddressModel,
@@ -177,11 +182,13 @@ export const getAllTransactions = async (req, res) => {
 
             // Add customer address details
             const customerAddress = transaction.customerAddress;
+            const formattedDate = transaction.transactionDate.toLocaleDateString();
 
             return {
                 id: transaction.id,
                 cart: transaction.cartId,
                 user: transaction.user.name,
+                date: formattedDate,
                 email: transaction.user.email,
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
@@ -220,6 +227,7 @@ export const getTransactionsByMonthAndPaymentStatus = async (req, res) => {
         const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
         const transactions = await TransactionModel.findAll({
+            order: [['transactionDate', 'ASC']],
             where: {
                 transactionDate: {
                     [Op.between]: [startDate, endDate]
@@ -261,11 +269,13 @@ export const getTransactionsByMonthAndPaymentStatus = async (req, res) => {
 
             // Add customer address details
             const customerAddress = transaction.customerAddress;
+            const formattedDate = transaction.transactionDate.toLocaleDateString();
 
             return {
                 id: transaction.id,
                 cart: transaction.cartId,
                 user: transaction.user.name,
+                date: formattedDate,
                 email: transaction.user.email,
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
@@ -310,14 +320,14 @@ export const updateDeliveryStatus = async (req, res) => {
     }
 }
 
-export const getTransactionById = async (req, res) => {
+export const getTransactionByUserId = async (req, res) => {
     const {id} = req.params;
     try {
         const transactions = await TransactionModel.findAll({
-            where: {userId: id}
+            where: {userId: id},
+            order: [['transactionDate', 'ASC']],
         });
 
-        // Loop through transactions to get cart items
         const transactionResponse = await Promise.all(transactions.map(async (transaction) => {
             const itemsInCart = await OrderModel.findAll({
                 where: {cartId: transaction.cartId},
@@ -329,7 +339,6 @@ export const getTransactionById = async (req, res) => {
                 ]
             });
 
-            // Format items with service name
             const formattedItems = itemsInCart.map(item => ({
                 id: item.id,
                 washStatus: item.washStatus,
@@ -338,9 +347,13 @@ export const getTransactionById = async (req, res) => {
                 price: item.service.price
             }));
 
+            // Format date to a readable string
+            const formattedDate = transaction.transactionDate.toLocaleDateString();
+
             return {
                 id: transaction.id,
                 cart: transaction.cartId,
+                date: formattedDate,
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
                 paymentMethod: transaction.paymentMethod,
@@ -352,7 +365,7 @@ export const getTransactionById = async (req, res) => {
 
         res.status(200).json({msg: "Success", transactions: transactionResponse});
     } catch (e) {
-        res.status(500).json({msg: e.message}); // It's better to send back the error message only
+        res.status(500).json({msg: e.message});
     }
 };
 
@@ -362,6 +375,7 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
     try {
         const transactions = await TransactionModel.findAll({
             where: {deliveryStatus: status},
+            order: [['transactionDate', 'ASC']],
             include: [
                 {
                     model: CustomerAddressModel,
@@ -370,6 +384,7 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
                 {
                     model: UserModel
                 }
+
             ]
         });
 
@@ -396,12 +411,15 @@ export const getTransactionsByDeliveryStatus = async (req, res) => {
 
             // Add customer address details
             const customerAddress = transaction.customerAddress;
+            const formattedDate = transaction.transactionDate.toLocaleDateString();
+
 
             return {
                 id: transaction.id,
                 cart: transaction.cartId,
                 user: transaction.user.name,
                 email: transaction.user.email,
+                date: formattedDate,
                 deliveryMethod: transaction.deliveryMethod,
                 deliveryStatus: transaction.deliveryStatus,
                 paymentMethod: transaction.paymentMethod,

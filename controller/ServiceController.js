@@ -66,12 +66,12 @@ export const deleteService = async (req, res) => {
         const service = await ServiceModel.findOne({where: {id}});
 
         if (!service) {
-            return res.status(404).json({msg: "Product not found"});
+            return res.status(404).json({msg: "service not found"});
         }
 
         await ServiceModel.destroy({where: {id}});
 
-        res.status(200).json({msg: "Product deleted successfully"});
+        res.status(200).json({msg: "service deleted successfully"});
     } catch (e) {
         console.log("Error deleting product:", e);
         res.status(500).json({msg: "Internal server error"});
@@ -84,12 +84,13 @@ export const getServicesByCategory = async (req, res) => {
     try {
         const service = await ServiceModel.findAll({
             where: {categoryId: categoryId},
+            order: [['serviceName', 'ASC']],
             include: CategoryModel
         });
 
         res.status(200).json({service: service});
     } catch (e) {
-        console.log("Error getting products:", e);
+        console.log("Error getting Services:", e);
         res.status(500).json({msg: e});
     }
 }
@@ -102,7 +103,7 @@ export const getServices = async (req, res) => {
 
         res.status(200).json({service: service});
     } catch (e) {
-        console.log("Error getting products:", e);
+        console.log("Error getting services:", e);
         res.status(500).json({msg: "Internal server error"});
     }
 }

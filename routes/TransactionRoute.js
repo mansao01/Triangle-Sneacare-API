@@ -1,9 +1,14 @@
 import express from "express";
 import {
-    createTransaction, getTransactionsByMonth,
+    createTransaction,
+    getTransactionsByMonth,
     getTransactionByUserId,
     getTransactionsByDeliveryStatus,
-    updateDeliveryStatus, getTransactionsByMonthAndPaymentStatus, getAllTransactions, sendFinishCleaningEmailToCustomer
+    updateDeliveryStatus,
+    getTransactionsByMonthAndPaymentStatus,
+    getAllTransactions,
+    sendFinishCleaningEmailToCustomer,
+    getTransactionsByDay
 } from "../controller/TransactionController.js";
 
 const router = express.Router();
@@ -14,6 +19,7 @@ router.get("/v1/transactions/:id", getTransactionByUserId)
 router.patch("/v1/transaction", updateDeliveryStatus)
 router.get("/v1/transactionsByDeliveryStatus", getTransactionsByDeliveryStatus)
 router.get("/v1/getTransactionsByMonth", getTransactionsByMonth)
+router.get("/v1/getTransactionsByDay", getTransactionsByDay)
 router.get("/v1/getAllTransactions", getAllTransactions)
 router.get("/v1/getTransactionsByMonthAndPaymentStatus", getTransactionsByMonthAndPaymentStatus)
 

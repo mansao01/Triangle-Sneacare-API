@@ -143,6 +143,87 @@ export const getTransactionsByMonth = async (req, res) => {
         res.status(500).json({msg: e.message});
     }
 }
+
+export const getTransactionsByDay = async (req, res) => {
+    try {
+        const today = new Date();
+        const startDate = new Date(today.setHours(0, 0, 0, 0));
+        const endDate = new Date(today.setHours(23, 59, 59, 999));
+
+        const transactions = await TransactionModel.findAll({
+            where: {
+                transactionDate: {
+                    [Op.between]: [startDate, endDate]
+                }
+            },
+            order: [['transactionDate', 'ASC']],
+            include: [
+                {
+                    model: CustomerAddressModel,
+                    attributes: ['title', 'receiverName', 'phone', 'fullAddress', 'latitude', 'longitude', 'notes']
+                },
+                {
+                    model: UserModel
+                }
+            ]
+        });
+
+        // Loop through transactions to get cart items
+        const transactionResponse = await Promise.all(transactions.map(async (transaction) => {
+            const itemsInCart = await OrderModel.findAll({
+                where: {cartId: transaction.cartId},
+                include: [
+                    {
+                        model: ServiceModel,
+                        attributes: ['serviceName', 'price']
+                    }
+                ]
+            });
+
+            // Format items with service name
+            const formattedItems = itemsInCart.map(item => ({
+                id: item.id,
+                washStatus: item.washStatus,
+                imageUrl: item.imageUrl,
+                serviceName: item.service.serviceName, // Access the service name
+                price: item.service.price
+            }));
+
+            // Add customer address details
+            const customerAddress = transaction.customerAddress;
+            const formattedDate = transaction.transactionDate.toLocaleDateString();
+
+            return {
+                id: transaction.id,
+                cart: transaction.cartId,
+                user: transaction.user.name,
+                date: formattedDate,
+                email: transaction.user.email,
+                deliveryMethod: transaction.deliveryMethod,
+                deliveryStatus: transaction.deliveryStatus,
+                paymentMethod: transaction.paymentMethod,
+                customerAddress: {
+                    id: customerAddress.id,
+                    title: customerAddress.title,
+                    receiverName: customerAddress.receiverName,
+                    phone: customerAddress.phone,
+                    fullAddress: customerAddress.fullAddress,
+                    latitude: customerAddress.latitude,
+                    longitude: customerAddress.longitude,
+                    notes: customerAddress.notes
+                },
+                paymentStatus: transaction.paymentStatus,
+                totalPurchasePrice: transaction.totalPurchasePrice,
+                items: formattedItems
+            };
+        }));
+
+        res.status(200).json({msg: "Success", transactions: transactionResponse});
+    } catch (e) {
+        res.status(500).json({msg: e.message});
+    }
+}
+
 export const getAllTransactions = async (req, res) => {
     try {
         const transactions = await TransactionModel.findAll({

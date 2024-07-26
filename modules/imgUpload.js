@@ -12,7 +12,7 @@ const gcs = new Storage({
 })
 
 // TODO: Tambahkan nama bucket yang digunakan
-const bucketName = 'capstone-coffee-bid'
+const bucketName = 'triangle-senacare'
 const bucket = gcs.bucket(bucketName)
 
 function getPublicUrl(filename) {

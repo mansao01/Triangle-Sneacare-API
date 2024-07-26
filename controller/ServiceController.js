@@ -100,6 +100,7 @@ export const getServices = async (req, res) => {
         const service = await ServiceModel.findAll({
             include: CategoryModel
         });
+        const serviceCount = service.length; // Get the count of services
 
         res.status(200).json({service: service});
     } catch (e) {
